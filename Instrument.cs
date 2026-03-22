@@ -4,8 +4,8 @@ static class Instrument
 {
     static int octave = 5;
 
-    static readonly bool mirrorMode = false;
-    static readonly Keymap noteInputMask = Keymap.J | Keymap.K | Keymap.L | Keymap.C;
+    const bool mirrorMode = false;
+    const Keymap noteInputMask = Keymap.J | Keymap.K | Keymap.L | Keymap.C;
     static readonly Keymap[] noteInputMaps = [
         Keymap.J,
         Keymap.J | Keymap.K,
@@ -20,20 +20,51 @@ static class Instrument
         Keymap.C,
         Keymap.J | Keymap.C
         ];
-    // todo: add octave related flag constants
-    static double checkTimeOffset = 0.0625f;
+    const Keymap octaveShiftUpKey = Keymap.F;
+    const Keymap octaveShiftDownKey = Keymap.D;
+    const Keymap octaveApplyKey = Keymap.S;
+    const double checkTimeOffset = 0.0625f;
 
     static Keymap keymap;
     static Keymap oldKeymap;
     static Keymap differenceKeymap;
     static double? changeCheckTime;
+    static bool octaveShiftedUp = false;
+    static bool octaveShiftedDown = false;
 
     static void UpdateOctave()
     {
-        if (differenceKeymap.HasFlag(Keymap.F))
-        { octave += keymap.HasFlag(Keymap.F) ? 1 : -1; }
-        if (differenceKeymap.HasFlag(Keymap.D))
-        { octave -= keymap.HasFlag(Keymap.D) ? 1 : -1; }
+        if (differenceKeymap.HasFlag(octaveShiftUpKey))
+        {
+            if (keymap.HasFlag(octaveShiftUpKey) && !octaveShiftedUp)
+            {
+                octave += 1;
+                octaveShiftedUp = true;
+            }
+            else if (octaveShiftedUp)
+            {
+                octave -= 1;
+                octaveShiftedUp = false;
+            }
+        }
+        if (differenceKeymap.HasFlag(octaveShiftDownKey))
+        {
+            if (keymap.HasFlag(octaveShiftDownKey) && !octaveShiftedDown)
+            {
+                octave -= 1;
+                octaveShiftedDown = true;
+            }
+            else if (octaveShiftedDown)
+            {
+                octave += 1;
+                octaveShiftedDown = false;
+            }
+        }
+        if (differenceKeymap.HasFlag(octaveApplyKey) && keymap.HasFlag(octaveApplyKey))
+        {
+            octaveShiftedUp = false;
+            octaveShiftedDown = false;
+        }
     }
 
     static void UpdateNote(double time)
