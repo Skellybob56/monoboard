@@ -22,7 +22,7 @@ static class Instrument
     const Keymap octaveShiftUpKey = Keymap.F;
     const Keymap octaveShiftDownKey = Keymap.D;
     const Keymap octaveApplyKey = Keymap.S;
-    const double checkTimeOffset = 0.0625f;
+    const double checkTimeOffset = 3d / 32d;
     const int transposition = 0;
 
     static int octave = 5;
