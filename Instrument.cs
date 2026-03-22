@@ -18,7 +18,8 @@ static class Instrument
         Keymap.K | Keymap.L | Keymap.C,
         Keymap.L | Keymap.C,
         Keymap.C,
-        Keymap.J | Keymap.C
+        Keymap.J | Keymap.C,
+        Keymap.J | Keymap.K | Keymap.C
         ];
     const Keymap octaveShiftUpKey = Keymap.F;
     const Keymap octaveShiftDownKey = Keymap.D;
@@ -95,7 +96,7 @@ static class Instrument
 
     public static void Update(Keymap newKeymap, double time)
     {
-        // todo: assert that noteInputMaps length is 12 (put in init if this class becomes a singleton)
+        // todo: assert that noteInputMaps length is 13 (put in init if this class becomes a singleton)
 
         // update keymaps
         oldKeymap = keymap;

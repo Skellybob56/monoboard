@@ -1,7 +1,4 @@
-﻿using Melanchall.DryWetMidi.Common;
-using Melanchall.DryWetMidi.Core;
-using Melanchall.DryWetMidi.Multimedia;
-using Raylib_cs;
+﻿using Raylib_cs;
 using static Raylib_cs.Raylib;
 
 namespace Monoboard;
@@ -12,7 +9,7 @@ internal static class Program
     [System.STAThread]
     public static void Main()
     {
-        InitWindow(800, 480, "Hello World");
+        InitWindow(200, 120, "Monoboard");
         
         while (!WindowShouldClose())
         {
@@ -20,9 +17,10 @@ internal static class Program
             Instrument.Update(Controller.GetKeymap(), GetTime());
 
             BeginDrawing();
-            ClearBackground(Color.White);
+            ClearBackground(Color.Black);
 
-            DrawText("Hello, world!", 12, 12, 20, Color.Black);
+            DrawFPS(8, 8);
+            DrawText("Monoboard", 16, 32, 20, Color.White);
 
             EndDrawing();
         }
