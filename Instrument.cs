@@ -2,8 +2,6 @@
 
 static class Instrument
 {
-    static int octave = 5;
-
     const bool mirrorMode = false;
     const Keymap noteInputMask = Keymap.J | Keymap.K | Keymap.L | Keymap.C;
     static readonly Keymap[] noteInputMaps = [
@@ -25,7 +23,9 @@ static class Instrument
     const Keymap octaveShiftDownKey = Keymap.D;
     const Keymap octaveApplyKey = Keymap.S;
     const double checkTimeOffset = 0.0625f;
+    const int transposition = 0;
 
+    static int octave = 5;
     static Keymap keymap;
     static Keymap oldKeymap;
     static Keymap differenceKeymap;
@@ -77,11 +77,11 @@ static class Instrument
                 int noteIndex = noteInputMaps.IndexOf(keymap & noteInputMask);
                 if (noteIndex == -1) // rest
                 {
-                    MidiManager.NoteEvent(octave, null);
+                    MidiManager.NoteEvent(null);
                 }
                 else
                 {
-                    MidiManager.NoteEvent(octave, noteIndex);
+                    MidiManager.NoteEvent((octave, noteIndex + transposition));
                 }
                 changeCheckTime = null;
             }

@@ -11,10 +11,10 @@ static class MidiManager
 
     static SevenBitNumber? playingNoteNumber;
     
-    public static void NoteEvent(int octave, int? note)
+    public static void NoteEvent((int octave, int note)? noteData)
     {
         // todo: add testing to ensure octave and note are within legal ranges
-        if (!note.HasValue)
+        if (!noteData.HasValue)
         {
             if (!playingNoteNumber.HasValue)
             { throw new Exception("Attempted to stop playing a note while no note was playing"); }
@@ -25,7 +25,7 @@ static class MidiManager
         if (playingNoteNumber.HasValue)
         { output.SendEvent(new NoteOffEvent(playingNoteNumber.Value, (SevenBitNumber)0)); }
 
-        SevenBitNumber noteNumber = (SevenBitNumber)(byte)(octave * 12 + note.Value);
+        SevenBitNumber noteNumber = (SevenBitNumber)(byte)(noteData.Value.octave * 12 + noteData.Value.note);
         output.SendEvent(new NoteOnEvent(noteNumber, noteVelocity));
         playingNoteNumber = noteNumber;
     }
