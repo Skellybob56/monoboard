@@ -8,14 +8,6 @@ namespace Monoboard;
 
 internal static class Program
 {
-    static readonly OutputDevice output = OutputDevice.GetByName("monoboard");
-
-    static void MidiUpdate()
-    {
-        if (IsKeyPressed(KeyboardKey.J)) { output.SendEvent(new NoteOnEvent((SevenBitNumber)60, (SevenBitNumber)100)); }
-        if (IsKeyReleased(KeyboardKey.J)) { output.SendEvent(new NoteOffEvent((SevenBitNumber)60, (SevenBitNumber)0)); }
-    }
-
     // STAThread is required if you deploy using NativeAOT on Windows - See https://github.com/raylib-cs/raylib-cs/issues/301
     [System.STAThread]
     public static void Main()
@@ -24,7 +16,8 @@ internal static class Program
         
         while (!WindowShouldClose())
         {
-            MidiUpdate();
+            Controller.Update(); // todo: consider making these singletons and passing data between them explicitly
+            Instrument.Update(Controller.keymap);
 
             BeginDrawing();
             ClearBackground(Color.White);
@@ -35,6 +28,6 @@ internal static class Program
         }
 
         CloseWindow();
-        output.Dispose();
+        MidiManager.Dispose();
     }
 }
