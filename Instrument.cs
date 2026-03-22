@@ -27,11 +27,10 @@ static class Instrument
 
     static void UpdateOctave()
     {
-        // todo: write code to manage octave
         if (differenceKeymap.HasFlag(Keymap.F))
-        {
-
-        }
+        { octave += keymap.HasFlag(Keymap.F) ? 1 : -1; }
+        if (differenceKeymap.HasFlag(Keymap.D))
+        { octave -= keymap.HasFlag(Keymap.D) ? 1 : -1; }
     }
 
     static void UpdateNote()
