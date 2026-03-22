@@ -1,0 +1,6 @@
+# builds
+/bin/
+/obj/
+
+# visual studio
+/.vs/
