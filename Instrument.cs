@@ -1,11 +1,10 @@
-﻿using System.Security.Cryptography;
-
-namespace Monoboard;
+﻿namespace Monoboard;
 
 static class Instrument
 {
     static int octave = 5;
 
+    static readonly bool mirrorMode = false;
     static readonly Keymap noteInputMask = Keymap.J | Keymap.K | Keymap.L | Keymap.C;
     static readonly Keymap[] noteInputMaps = [
         Keymap.J,
@@ -22,18 +21,23 @@ static class Instrument
         Keymap.J | Keymap.C
         ];
 
+    static Keymap keymap;
     static Keymap oldKeymap;
+    static Keymap differenceKeymap;
 
-    public static void Update(Keymap keymap)
+    static void UpdateOctave()
     {
-        Keymap changedButtons = keymap ^ oldKeymap;
-        // todo: assert that noteInputMaps length is 12
-
         // todo: write code to manage octave
+        if (differenceKeymap.HasFlag(Keymap.F))
+        {
 
-        // manage note
+        }
+    }
+
+    static void UpdateNote()
+    {
         // todo: add delay between note changed and update
-        if ((changedButtons & noteInputMask) != Keymap.None) // if note changed
+        if ((differenceKeymap & noteInputMask) != Keymap.None) // if note changed
         {
             int noteIndex = noteInputMaps.IndexOf(keymap & noteInputMask);
             if (noteIndex == -1) // rest
@@ -45,8 +49,20 @@ static class Instrument
                 MidiManager.NoteEvent(octave, noteIndex);
             }
         }
+    }
 
-        // old variables
+
+    public static void Update(Keymap newKeymap)
+    {
+        // todo: assert that noteInputMaps length is 12 (put in init if this class becomes a singleton)
+
+        // update keymaps
         oldKeymap = keymap;
+        keymap = mirrorMode? (Keymap)Utilities.ReverseBits((byte)newKeymap) : newKeymap;
+        differenceKeymap = keymap ^ oldKeymap;
+
+        UpdateOctave();
+
+        UpdateNote();
     }
 }

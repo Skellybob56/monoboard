@@ -19,11 +19,9 @@ enum Keymap : byte
 
 static class Controller
 {
-    public static Keymap keymap;
-
-    public static void Update()
+    public static Keymap GetKeymap()
     {
-        keymap = Keymap.None;
+        Keymap keymap = Keymap.None;
 
         if (IsKeyDown(KeyboardKey.A)) { keymap |= Keymap.A; }
         if (IsKeyDown(KeyboardKey.S)) { keymap |= Keymap.S; }
@@ -34,5 +32,7 @@ static class Controller
         if (IsKeyDown(KeyboardKey.K)) { keymap |= Keymap.K; }
         if (IsKeyDown(KeyboardKey.L)) { keymap |= Keymap.L; }
         if (IsKeyDown(KeyboardKey.Semicolon)) { keymap |= Keymap.C; }
+
+        return keymap;
     }
 }

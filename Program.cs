@@ -16,8 +16,8 @@ internal static class Program
         
         while (!WindowShouldClose())
         {
-            Controller.Update(); // todo: consider making these singletons and passing data between them explicitly
-            Instrument.Update(Controller.keymap);
+            // todo: consider making these singletons and passing data between them explicitly for improved encapsulation
+            Instrument.Update(Controller.GetKeymap());
 
             BeginDrawing();
             ClearBackground(Color.White);
