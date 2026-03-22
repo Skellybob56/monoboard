@@ -20,10 +20,13 @@ static class Instrument
         Keymap.C,
         Keymap.J | Keymap.C
         ];
+    // todo: add octave related flag constants
+    static double checkTimeOffset = 0.0625f;
 
     static Keymap keymap;
     static Keymap oldKeymap;
     static Keymap differenceKeymap;
+    static double? changeCheckTime;
 
     static void UpdateOctave()
     {
@@ -33,25 +36,33 @@ static class Instrument
         { octave -= keymap.HasFlag(Keymap.D) ? 1 : -1; }
     }
 
-    static void UpdateNote()
+    static void UpdateNote(double time)
     {
-        // todo: add delay between note changed and update
-        if ((differenceKeymap & noteInputMask) != Keymap.None) // if note changed
+        if (changeCheckTime.HasValue)
         {
-            int noteIndex = noteInputMaps.IndexOf(keymap & noteInputMask);
-            if (noteIndex == -1) // rest
+            if (changeCheckTime <= time)
             {
-                MidiManager.NoteEvent(octave, null);
+                int noteIndex = noteInputMaps.IndexOf(keymap & noteInputMask);
+                if (noteIndex == -1) // rest
+                {
+                    MidiManager.NoteEvent(octave, null);
+                }
+                else
+                {
+                    MidiManager.NoteEvent(octave, noteIndex);
+                }
+                changeCheckTime = null;
             }
-            else
-            {
-                MidiManager.NoteEvent(octave, noteIndex);
-            }
+        }
+        else
+        {
+            if ((differenceKeymap & noteInputMask) != Keymap.None)
+            { changeCheckTime = time + checkTimeOffset; } // if note changed
         }
     }
 
 
-    public static void Update(Keymap newKeymap)
+    public static void Update(Keymap newKeymap, double time)
     {
         // todo: assert that noteInputMaps length is 12 (put in init if this class becomes a singleton)
 
@@ -62,6 +73,6 @@ static class Instrument
 
         UpdateOctave();
 
-        UpdateNote();
+        UpdateNote(time);
     }
 }
