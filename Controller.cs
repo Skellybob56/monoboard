@@ -17,9 +17,14 @@ enum Keymap : byte
     C = 0x80
 }
 
-static class Controller
+class Controller : Singleton<Controller>
 {
-    public static Keymap GetKeymap()
+    public static Controller Create()
+    { return Register(new Controller()); }
+
+    private Controller() { }
+
+    public Keymap GetKeymap()
     {
         Keymap keymap = Keymap.None;
 

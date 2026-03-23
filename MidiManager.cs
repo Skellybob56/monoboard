@@ -4,14 +4,19 @@ using Melanchall.DryWetMidi.Multimedia;
 
 namespace Monoboard;
 
-static class MidiManager
+class MidiManager : Singleton<MidiManager>
 {
-    static readonly SevenBitNumber noteVelocity = (SevenBitNumber)100;
-    static readonly OutputDevice output = OutputDevice.GetByName("monoboard");
+    public static MidiManager Create()
+    { return Register(new MidiManager()); }
 
-    static SevenBitNumber? playingNoteNumber;
+    private MidiManager() { }
+
+    readonly SevenBitNumber noteVelocity = (SevenBitNumber)127;
+    readonly OutputDevice output = OutputDevice.GetByName("monoboard");
+
+    SevenBitNumber? playingNoteNumber;
     
-    public static void NoteEvent((int octave, int note)? noteData)
+    public void NoteEvent((int octave, int note)? noteData)
     {
         // todo: add testing to ensure octave and note are within legal ranges
         if (!noteData.HasValue)
@@ -31,7 +36,7 @@ static class MidiManager
         playingNoteNumber = noteNumber;
     }
 
-    public static void Dispose()
+    public void Dispose()
     {
         output.Dispose();
     }

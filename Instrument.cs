@@ -1,37 +1,37 @@
 ﻿namespace Monoboard;
 
-static class Instrument
+class Instrument : Singleton<Instrument>
 {
+    public static Instrument Create(MidiManager midiManager)
+    { return Register(new Instrument(midiManager)); }
+
     const bool mirrorMode = true;
     const Keymap noteInputMask = Keymap.J | Keymap.K | Keymap.L | Keymap.C;
-
-    static Keymap[] combinations = [
-        Keymap.J,
-        Keymap.J | Keymap.L,
-        Keymap.J | Keymap.K | Keymap.L,
-        Keymap.J | Keymap.K,
-        Keymap.K,
-        Keymap.K | Keymap.L,
-        Keymap.J | Keymap.K | Keymap.L | Keymap.C,
-        Keymap.J | Keymap.L | Keymap.C
-        ];
-    static sbyte[] notes = [0, 2, 4, 5, 7, 9, 11, 12];
-
     const Keymap octaveShiftUpKey = Keymap.F;
     const Keymap octaveShiftDownKey = Keymap.D;
     const Keymap octaveApplyKey = Keymap.S;
     const double checkTimeOffset = 3d / 32d; // in seconds
-    const int rootNote = -5;
 
-    static int octave = 5;
-    static Keymap keymap;
-    static Keymap oldKeymap;
-    static Keymap differenceKeymap;
-    static double? changeCheckTime;
-    static bool octaveShiftedUp = false;
-    static bool octaveShiftedDown = false;
+    readonly MidiManager midiManager;
 
-    static void UpdateOctave()
+    int octave = 5;
+    Keymap keymap;
+    Keymap oldKeymap;
+    Keymap differenceKeymap;
+    double? changeCheckTime;
+    bool octaveShiftedUp = false;
+    bool octaveShiftedDown = false;
+
+    int rootNote = -5;
+    Keymap[] combinations = FileReader.GetCombinations("Diatonic LC02");
+    sbyte[] notes = [0, 2, 4, 5, 7, 9, 11, 12];
+
+    private Instrument(MidiManager midiManager)
+    {
+        this.midiManager = midiManager;
+    }
+
+    void UpdateOctave()
     {
         if (differenceKeymap.HasFlag(octaveShiftUpKey))
         {
@@ -66,7 +66,7 @@ static class Instrument
         }
     }
 
-    static void UpdateNote(double time)
+    void UpdateNote(double time)
     {
         if (changeCheckTime.HasValue)
         {
@@ -75,11 +75,11 @@ static class Instrument
                 int noteIndex = combinations.IndexOf(keymap & noteInputMask);
                 if (noteIndex == -1) // rest
                 {
-                    MidiManager.NoteEvent(null);
+                    midiManager.NoteEvent(null);
                 }
                 else
                 {
-                    MidiManager.NoteEvent((octave, notes[noteIndex] + rootNote));
+                    midiManager.NoteEvent((octave, notes[noteIndex] + rootNote));
                 }
                 changeCheckTime = null;
             }
@@ -92,9 +92,8 @@ static class Instrument
     }
 
 
-    public static void Update(Keymap newKeymap, double time)
+    public void Update(Keymap newKeymap, double time)
     {
-        // todo: make this class a singleton and add functions to explicitly update combinations and notes arrays to allow for things like root note to be encoded in them
         // todo: assert that the length of combinations is the same as the length of notes
 
         // update keymaps

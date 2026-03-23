@@ -12,10 +12,14 @@ internal static class Program
         InitWindow(200, 60, "Monoboard");
         Font jetBrainsMonoFont = LoadFont("assets/JetBrainsMono-Regular.ttf");
 
+        Controller controller = Controller.Create();
+        MidiManager midiManager = MidiManager.Create();
+        Instrument instrument = Instrument.Create(midiManager);
+
         while (!WindowShouldClose())
         {
-            // todo: consider making these singletons and passing data between them explicitly for improved encapsulation
-            Instrument.Update(Controller.GetKeymap(), GetTime());
+            Keymap latestKeymap = controller.GetKeymap();
+            instrument.Update(latestKeymap, GetTime());
 
             BeginDrawing();
             ClearBackground(Color.Black);
@@ -27,6 +31,6 @@ internal static class Program
         }
 
         CloseWindow();
-        MidiManager.Dispose();
+        midiManager.Dispose();
     }
 }
