@@ -9,8 +9,9 @@ internal static class Program
     [System.STAThread]
     public static void Main()
     {
-        InitWindow(200, 120, "Monoboard");
-        
+        InitWindow(200, 60, "Monoboard");
+        Font jetBrainsMonoFont = LoadFont("assets/JetBrainsMono-Regular.ttf");
+
         while (!WindowShouldClose())
         {
             // todo: consider making these singletons and passing data between them explicitly for improved encapsulation
@@ -20,7 +21,7 @@ internal static class Program
             ClearBackground(Color.Black);
 
             DrawFPS(8, 8);
-            DrawText("Monoboard", 16, 32, 20, Color.White);
+            DrawTextEx(GetFontDefault(), "Monoboard", new(16, 32), 20, 10, Color.White);
 
             EndDrawing();
         }

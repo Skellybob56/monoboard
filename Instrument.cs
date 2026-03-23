@@ -2,28 +2,26 @@
 
 static class Instrument
 {
-    const bool mirrorMode = false;
+    const bool mirrorMode = true;
     const Keymap noteInputMask = Keymap.J | Keymap.K | Keymap.L | Keymap.C;
-    static readonly Keymap[] noteInputMaps = [
+
+    static Keymap[] combinations = [
         Keymap.J,
+        Keymap.J | Keymap.L,
+        Keymap.J | Keymap.K | Keymap.L,
         Keymap.J | Keymap.K,
         Keymap.K,
         Keymap.K | Keymap.L,
-        Keymap.L,
-        Keymap.J | Keymap.L,
-        Keymap.J | Keymap.K | Keymap.L,
         Keymap.J | Keymap.K | Keymap.L | Keymap.C,
-        Keymap.K | Keymap.L | Keymap.C,
-        Keymap.L | Keymap.C,
-        Keymap.C,
-        Keymap.J | Keymap.C,
-        Keymap.J | Keymap.K | Keymap.C
+        Keymap.J | Keymap.L | Keymap.C
         ];
+    static sbyte[] notes = [0, 2, 4, 5, 7, 9, 11, 12];
+
     const Keymap octaveShiftUpKey = Keymap.F;
     const Keymap octaveShiftDownKey = Keymap.D;
     const Keymap octaveApplyKey = Keymap.S;
-    const double checkTimeOffset = 3d / 32d;
-    const int transposition = 0;
+    const double checkTimeOffset = 3d / 32d; // in seconds
+    const int rootNote = -5;
 
     static int octave = 5;
     static Keymap keymap;
@@ -74,14 +72,14 @@ static class Instrument
         {
             if (changeCheckTime <= time)
             {
-                int noteIndex = noteInputMaps.IndexOf(keymap & noteInputMask);
+                int noteIndex = combinations.IndexOf(keymap & noteInputMask);
                 if (noteIndex == -1) // rest
                 {
                     MidiManager.NoteEvent(null);
                 }
                 else
                 {
-                    MidiManager.NoteEvent((octave, noteIndex + transposition));
+                    MidiManager.NoteEvent((octave, notes[noteIndex] + rootNote));
                 }
                 changeCheckTime = null;
             }
@@ -96,7 +94,8 @@ static class Instrument
 
     public static void Update(Keymap newKeymap, double time)
     {
-        // todo: assert that noteInputMaps length is 13 (put in init if this class becomes a singleton)
+        // todo: make this class a singleton and add functions to explicitly update combinations and notes arrays to allow for things like root note to be encoded in them
+        // todo: assert that the length of combinations is the same as the length of notes
 
         // update keymaps
         oldKeymap = keymap;

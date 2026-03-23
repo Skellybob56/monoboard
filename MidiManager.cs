@@ -17,8 +17,9 @@ static class MidiManager
         if (!noteData.HasValue)
         {
             if (!playingNoteNumber.HasValue)
-            { throw new Exception("Attempted to stop playing a note while no note was playing"); }
+            { return; } // Attempted to stop playing a note while no note was playing
             output.SendEvent(new NoteOffEvent(playingNoteNumber.Value, (SevenBitNumber)0));
+            playingNoteNumber = null;
             return;
         }
 
