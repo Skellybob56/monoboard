@@ -2,9 +2,14 @@
 
 static class FileReader
 {
+    const string combinationsFolder = "assets/patterns/";
+    const string combinationsExtention = ".kmap";
+    const string notesFolder = "assets/patterns/";
+    const string notesExtention = ".nmap";
+
     public static Keymap[] GetCombinations(string filename)
     {
-        string path = $"assets/patterns/{filename}.kmap";
+        string path = combinationsFolder + filename + combinationsExtention;
         StreamReader streamReader = new StreamReader(path);
 
         int position = 0;
@@ -44,5 +49,55 @@ static class FileReader
         // todo: check if there are any repetitions and throw an exception if so
 
         return combinations.ToArray();
+    }
+
+    public static sbyte[] GetNotes(string filename, int rootNote, int correctLength)
+    {
+        const string numbers = "0123456789";
+
+        string path = notesFolder + filename + notesExtention;
+        StreamReader streamReader = new StreamReader(path);
+
+        List<sbyte> notes = [];
+        int? currentNote = null;
+        bool negative = false;
+        for (char character; !streamReader.EndOfStream; )
+        {
+            character = (char)streamReader.Read();
+
+            if (currentNote.HasValue)
+            {
+                if (numbers.Contains(character)) // new digit
+                {
+                    currentNote *= 10;
+                    currentNote += (sbyte)(character - numbers[0]);
+                }
+                else // number ended
+                {
+                    notes.Add((sbyte)((negative? -currentNote.Value : currentNote.Value) + rootNote));
+                    currentNote = null;
+                    negative = false;
+                }
+            }
+            else if (character == '-')
+            {
+                negative = true;
+            }
+            else if (numbers.Contains(character))
+            {
+                currentNote = (sbyte)(character - numbers[0]);
+            }
+        }
+        if (currentNote.HasValue) // number ended at eof
+        {
+            notes.Add((sbyte)((negative ? -currentNote.Value : currentNote.Value) + rootNote));
+            currentNote = null;
+            negative = false;
+        }
+
+        if (notes.Count != correctLength)
+        { throw new Exception("The number of notes loaded is not equal to the number of combinations."); }
+
+        return notes.ToArray();
     }
 }
