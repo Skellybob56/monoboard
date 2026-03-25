@@ -25,10 +25,39 @@ class Instrument : Singleton<Instrument>
     Keymap[] combinations;
     sbyte[] notes;
 
+
+    void DebugOutputNoteGuide()
+    {
+        string DebugOutputOfSingleNote(Keymap combination, sbyte note)
+        {
+            const string noteDisplay = "C C#D D#E F F#G G#A A#B ";
+
+            // assumes that noteInputMask is 0000 1111
+            string combinationString = combination.KeymapToString().Substring(4);
+
+            int tone = note;
+            int octave = 4;
+            while (tone < 0)
+            { tone += 12; octave -= 1; }
+            while (tone >= 12)
+            { tone -= 12; octave += 1; }
+            string toneString = noteDisplay.Substring(tone*2, 2);
+
+            return new string(combinationString.Reverse().ToArray()) + $" {toneString}{octave} " + combinationString;
+        }
+
+        for (int i = 0; i < combinations.Length; i++)
+        {
+            Console.WriteLine(DebugOutputOfSingleNote(combinations[i], notes[i]));
+        }
+    }
+
     void InitCombinationsAndScale(string combinationsFilename, string notesFilename, int rootNote)
     {
         combinations = FileReader.GetCombinations(combinationsFilename);
         notes = FileReader.GetNotes(notesFilename, rootNote, combinations.Length);
+
+        DebugOutputNoteGuide();
     }
 
     private Instrument(MidiManager midiManager)
