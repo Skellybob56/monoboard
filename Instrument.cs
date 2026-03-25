@@ -22,13 +22,19 @@ class Instrument : Singleton<Instrument>
     bool octaveShiftedUp = false;
     bool octaveShiftedDown = false;
 
-    int rootNote = -5;
-    Keymap[] combinations = FileReader.GetCombinations("Diatonic LC02");
-    sbyte[] notes = [0, 2, 4, 5, 7, 9, 11, 12];
+    Keymap[] combinations;
+    sbyte[] notes;
+
+    void InitCombinationsAndScale(string combinationsFilename, string notesFilename, int rootNote)
+    {
+        combinations = FileReader.GetCombinations(combinationsFilename);
+        notes = FileReader.GetNotes(notesFilename, rootNote, combinations.Length);
+    }
 
     private Instrument(MidiManager midiManager)
     {
         this.midiManager = midiManager;
+        InitCombinationsAndScale("Diatonic LC03", "Major 8", -5);
     }
 
     void UpdateOctave()
@@ -79,7 +85,7 @@ class Instrument : Singleton<Instrument>
                 }
                 else
                 {
-                    midiManager.NoteEvent((octave, notes[noteIndex] + rootNote));
+                    midiManager.NoteEvent((octave, notes[noteIndex]));
                 }
                 changeCheckTime = null;
             }
