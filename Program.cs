@@ -1,19 +1,20 @@
 ﻿using Raylib_cs;
+using System.Runtime.InteropServices;
 using static Raylib_cs.Raylib;
 
 namespace Monoboard;
 
 internal static class Program
 {
-    const int desiredFramerate = 250;
-    const double desiredFrametime = 1d/desiredFramerate;
+    [DllImport("winmm.dll")]
+    static extern uint timeBeginPeriod(uint uPeriod);
+    [DllImport("winmm.dll")]
+    static extern uint timeEndPeriod(uint uPeriod);
 
     static void Render()
     {
-        BeginDrawing();
         ClearBackground(Color.Black);
         DrawTextEx(GetFontDefault(), "Monoboard", new(12, 12), 20, 12, Color.White);
-        EndDrawing();
     }
 
     // STAThread is required if you deploy using NativeAOT on Windows - See https://github.com/raylib-cs/raylib-cs/issues/301
@@ -28,25 +29,25 @@ internal static class Program
         Instrument instrument = Instrument.Create(midiManager);
 
         // populate the screen buffer
+        BeginDrawing();
         Render();
+        EndDrawing();
 
+        timeBeginPeriod(1);
         while (!WindowShouldClose())
         {
-            double frameStartTime = GetTime();
             Keymap latestKeymap = controller.GetKeymap();
             instrument.Update(latestKeymap, GetTime());
 
-            bool renderNeeded = false; // replace when dynamic picture elements are added
-            if (renderNeeded)
-            { Render(); }
-            else
-            {
-                double timeTillNextFrame = desiredFrametime - (GetTime() - frameStartTime);
-                if (timeTillNextFrame < 0d) { continue; }
-                WaitTime(timeTillNextFrame);
-                PollInputEvents();
-            }
+
+            // end of tick
+            Thread.Sleep(1); // place the smallest frequency reduction on the loop that i can to prevent the loop from consuming an entire cpu thread
+            bool renderFrame = false;
+            if (renderFrame)
+            { BeginDrawing(); Render(); EndDrawing(); } // EndDrawing handles PollInputEvents
+            else { PollInputEvents(); }
         }
+        timeEndPeriod(1);
 
         CloseWindow();
         midiManager.Dispose();
