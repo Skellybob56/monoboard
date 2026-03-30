@@ -63,7 +63,7 @@ class Instrument : Singleton<Instrument>
     private Instrument(MidiManager midiManager)
     {
         this.midiManager = midiManager;
-        InitCombinationsAndScale("Diatonic LC03", "Major 8", -5);
+        InitCombinationsAndScale("Diatonic LC03", "Minor 8", 0);
     }
 
     void UpdateOctave()
@@ -107,7 +107,7 @@ class Instrument : Singleton<Instrument>
         {
             if (changeCheckTime <= time)
             {
-                int noteIndex = combinations.IndexOf(keymap & noteInputMask);
+                int noteIndex = Array.IndexOf(combinations, keymap & noteInputMask);
                 if (noteIndex == -1) // rest
                 {
                     midiManager.NoteEvent(null);
