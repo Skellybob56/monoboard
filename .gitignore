@@ -4,3 +4,6 @@
 
 # visual studio
 /.vs/
+
+# other
+/history/

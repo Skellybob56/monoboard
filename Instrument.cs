@@ -1,4 +1,5 @@
-﻿namespace Monoboard;
+﻿
+namespace Monoboard;
 
 class Instrument : Singleton<Instrument>
 {
@@ -10,7 +11,7 @@ class Instrument : Singleton<Instrument>
     const Keymap octaveShiftUpKey = Keymap.F;
     const Keymap octaveShiftDownKey = Keymap.D;
     const Keymap octaveApplyKey = Keymap.S;
-    const double checkTimeOffset = 3d / 32d; // in seconds
+    const double checkTimeOffset = 3d / 64d; // in seconds
 
     readonly MidiManager midiManager;
 
@@ -26,7 +27,7 @@ class Instrument : Singleton<Instrument>
     sbyte[] notes;
 
 
-    void DebugOutputNoteGuide()
+    static void DebugOutputNoteGuide(ReadOnlySpan<Keymap> combinations, ReadOnlySpan<sbyte> notes)
     {
         string DebugOutputOfSingleNote(Keymap combination, sbyte note)
         {
@@ -52,18 +53,21 @@ class Instrument : Singleton<Instrument>
         }
     }
 
-    void InitCombinationsAndScale(string combinationsFilename, string notesFilename, int rootNote)
+    static (Keymap[] combinations, sbyte[] notes) InitCombinationsAndScale(int scaleSize, string combinationsFilename, string notesFilename, int rootNote)
     {
-        combinations = FileReader.GetCombinations(combinationsFilename);
-        notes = FileReader.GetNotes(notesFilename, rootNote, combinations.Length);
+        string sizePrefix = scaleSize.ToString() + " - ";
+        Keymap[] combinations = FileReader.GetCombinations(sizePrefix + combinationsFilename);
+        sbyte[] notes = FileReader.GetNotes(sizePrefix + notesFilename, rootNote, combinations.Length);
 
-        DebugOutputNoteGuide();
+        DebugOutputNoteGuide(combinations, notes);
+
+        return (combinations, notes);
     }
 
     private Instrument(MidiManager midiManager)
     {
         this.midiManager = midiManager;
-        InitCombinationsAndScale("Diatonic LC03", "Minor 8", 0);
+        (combinations, notes) = InitCombinationsAndScale(8, "LC03", "Major", 7);
     }
 
     void UpdateOctave()
