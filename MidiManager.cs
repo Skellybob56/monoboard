@@ -39,11 +39,11 @@ class MidiManager : Singleton<MidiManager>
     // todo: ensure safety when note or velocity are above 0x7F
     void NoteOnEvent(byte note, byte velocity)
     {
-        TEVirtualMidi.virtualMIDISendData(MidiPortHandler.lpvmMidiPort, [0x90, note, velocity], 3);
+        TEVirtualMidi.virtualMIDISendData(MidiPortHandler.LpvmMidiPort, [0x90, note, velocity], 3);
     }
     void NoteOffEvent(byte note)
     {
-        TEVirtualMidi.virtualMIDISendData(MidiPortHandler.lpvmMidiPort, [0x80, note, 0x00], 3);
+        TEVirtualMidi.virtualMIDISendData(MidiPortHandler.LpvmMidiPort, [0x80, note, 0x00], 3);
     }
 
     protected override void Dispose()

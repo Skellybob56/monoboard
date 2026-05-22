@@ -5,8 +5,8 @@ namespace Monoboard;
 
 static class MidiPortHandler
 {
-	public static bool Active => lpvmMidiPort != nint.Zero;
-	public static nint lpvmMidiPort { get; private set; } = nint.Zero;
+	public static bool Active => LpvmMidiPort != nint.Zero;
+	public static nint LpvmMidiPort { get; private set; } = nint.Zero;
 
 	public static void Initialize(string portName)
 	{
@@ -16,7 +16,7 @@ static class MidiPortHandler
 		}
 
 		// create midi port with virtualMIDICreatePortEx2 from teVirtualMIDI64.dll
-		lpvmMidiPort = TEVirtualMidi.virtualMIDICreatePortEx2(portName, nint.Zero, nint.Zero, 65535, (uint)TEVirtualMidi.VmFlags.InstantiateTX);
+		LpvmMidiPort = TEVirtualMidi.virtualMIDICreatePortEx2(portName, nint.Zero, nint.Zero, 65535, (uint)TEVirtualMidi.VmFlags.InstantiateTX);
 		if (!Active)
 		{ throw new Exception("Something went wrong with creating the virtual midi port"); }
 	}
@@ -28,7 +28,7 @@ static class MidiPortHandler
 			throw new InvalidOperationException($"{nameof(MidiPortHandler)} is not initialised.");
 		}
 		
-		TEVirtualMidi.virtualMIDIClosePort(lpvmMidiPort);
-		lpvmMidiPort = nint.Zero;
+		TEVirtualMidi.virtualMIDIClosePort(LpvmMidiPort);
+		LpvmMidiPort = nint.Zero;
 	}
 }
