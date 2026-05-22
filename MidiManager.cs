@@ -1,6 +1,4 @@
-﻿using Melanchall.DryWetMidi.Common;
-using Melanchall.DryWetMidi.Core;
-using Melanchall.DryWetMidi.Multimedia;
+﻿using TEVirtualMidiBindingsCs;
 
 namespace Monoboard;
 
@@ -9,12 +7,15 @@ class MidiManager : Singleton<MidiManager>
     public static MidiManager Create()
     { return Register(new MidiManager()); }
 
-    private MidiManager() { }
+    const string midiDeviceName = "monoboard";
+    readonly byte noteVelocity = 0x7F; // 7 bit int max
 
-    readonly SevenBitNumber noteVelocity = (SevenBitNumber)127;
-    readonly OutputDevice output = OutputDevice.GetByName("monoboard");
+    private MidiManager()
+    {
+        MidiPortHandler.Initialize(midiDeviceName);
+    }
 
-    SevenBitNumber? playingNoteNumber;
+    byte? playingNoteNumber;
     
     public void NoteEvent((int octave, int note)? noteData)
     {
@@ -22,22 +23,31 @@ class MidiManager : Singleton<MidiManager>
         if (!noteData.HasValue)
         {
             if (!playingNoteNumber.HasValue)
-            { return; } // Attempted to stop playing a note while no note was playing
-            output.SendEvent(new NoteOffEvent(playingNoteNumber.Value, (SevenBitNumber)0));
+            { return; } // attempted to stop playing a note while no note was playing
+            NoteOffEvent(playingNoteNumber.Value);
             playingNoteNumber = null;
             return;
         }
 
         if (playingNoteNumber.HasValue)
-        { output.SendEvent(new NoteOffEvent(playingNoteNumber.Value, (SevenBitNumber)0)); }
+        { NoteOffEvent(playingNoteNumber.Value); }
 
-        SevenBitNumber noteNumber = (SevenBitNumber)(byte)(noteData.Value.octave * 12 + noteData.Value.note);
-        output.SendEvent(new NoteOnEvent(noteNumber, noteVelocity));
-        playingNoteNumber = noteNumber;
+        playingNoteNumber = (byte)((noteData.Value.octave * 12 + noteData.Value.note) & 0x7F);
+        NoteOnEvent(playingNoteNumber.Value, noteVelocity);
     }
 
-    public void Dispose()
+    // todo: ensure safety when note or velocity are above 0x7F
+    void NoteOnEvent(byte note, byte velocity)
     {
-        output.Dispose();
+        TEVirtualMidi.virtualMIDISendData(MidiPortHandler.lpvmMidiPort, [0x90, note, velocity], 3);
+    }
+    void NoteOffEvent(byte note)
+    {
+        TEVirtualMidi.virtualMIDISendData(MidiPortHandler.lpvmMidiPort, [0x80, note, 0x00], 3);
+    }
+
+    protected override void Dispose()
+    {
+        MidiPortHandler.Dispose();
     }
 }

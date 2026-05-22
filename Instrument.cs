@@ -1,5 +1,4 @@
-﻿
-namespace Monoboard;
+﻿namespace Monoboard;
 
 class Instrument : Singleton<Instrument>
 {
@@ -11,7 +10,7 @@ class Instrument : Singleton<Instrument>
     const Keymap octaveShiftUpKey = Keymap.F;
     const Keymap octaveShiftDownKey = Keymap.D;
     const Keymap octaveApplyKey = Keymap.S;
-    const double checkTimeOffset = 3d / 64d; // in seconds
+    const double checkTimeOffset = 1d / 16d; // in seconds
 
     readonly MidiManager midiManager;
 
@@ -67,11 +66,12 @@ class Instrument : Singleton<Instrument>
     private Instrument(MidiManager midiManager)
     {
         this.midiManager = midiManager;
-        (combinations, notes) = InitCombinationsAndScale(8, "LC03", "Major", 7);
+        (combinations, notes) = InitCombinationsAndScale(8, "LC03", "Dorian", 2);
     }
 
     void UpdateOctave()
     {
+        // todo: reduce repetiton
         if (differenceKeymap.HasFlag(octaveShiftUpKey))
         {
             if (keymap.HasFlag(octaveShiftUpKey) && !octaveShiftedUp)

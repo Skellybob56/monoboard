@@ -50,6 +50,6 @@ internal static class Program
         timeEndPeriod(1);
 
         CloseWindow();
-        midiManager.Dispose();
+        MidiManager.Destroy();
     }
 }
