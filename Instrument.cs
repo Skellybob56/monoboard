@@ -25,9 +25,25 @@ class Instrument : Singleton<Instrument>
     Keymap[] combinations;
     sbyte[] notes;
 
+    static (Keymap[] combinations, sbyte[] notes) InitCombinationsAndScale(int scaleSize, string combinationsFilename, string notesFilename, int rootNote)
+    {
+        string sizePrefix = scaleSize.ToString() + " - ";
+        Keymap[] combinations = FileReader.GetCombinations(sizePrefix + combinationsFilename);
+        sbyte[] notes = FileReader.GetNotes(sizePrefix + notesFilename, rootNote, combinations.Length);
+
+        DebugOutputNoteGuide(combinations, notes);
+
+        return (combinations, notes);
+    }
+
 
     static void DebugOutputNoteGuide(ReadOnlySpan<Keymap> combinations, ReadOnlySpan<sbyte> notes)
     {
+        for (int i = 0; i < combinations.Length; i++)
+        {
+            Console.WriteLine(DebugOutputOfSingleNote(combinations[i], notes[i]));
+        }
+
         string DebugOutputOfSingleNote(Keymap combination, sbyte note)
         {
             const string noteDisplay = "C C#D D#E F F#G G#A A#B ";
@@ -45,28 +61,25 @@ class Instrument : Singleton<Instrument>
 
             return new string(combinationString.Reverse().ToArray()) + $" {toneString}{octave} " + combinationString;
         }
-
-        for (int i = 0; i < combinations.Length; i++)
-        {
-            Console.WriteLine(DebugOutputOfSingleNote(combinations[i], notes[i]));
-        }
-    }
-
-    static (Keymap[] combinations, sbyte[] notes) InitCombinationsAndScale(int scaleSize, string combinationsFilename, string notesFilename, int rootNote)
-    {
-        string sizePrefix = scaleSize.ToString() + " - ";
-        Keymap[] combinations = FileReader.GetCombinations(sizePrefix + combinationsFilename);
-        sbyte[] notes = FileReader.GetNotes(sizePrefix + notesFilename, rootNote, combinations.Length);
-
-        DebugOutputNoteGuide(combinations, notes);
-
-        return (combinations, notes);
     }
 
     private Instrument(MidiManager midiManager)
     {
         this.midiManager = midiManager;
         (combinations, notes) = InitCombinationsAndScale(8, "LC03", "Mixolydian", 0);
+    }
+
+    public void Update(Keymap newKeymap, double time)
+    {
+        // todo: assert that the length of combinations is the same as the length of notes
+
+        // update keymaps
+        differenceKeymap = newKeymap ^ keymap;
+        keymap = newKeymap;
+
+        UpdateOctave();
+        UpdateSharping();
+        UpdateNote(time);
     }
 
     void UpdateOctave()
@@ -122,6 +135,7 @@ class Instrument : Singleton<Instrument>
                 int noteIndex = Array.IndexOf(combinations, keymap & noteInputMask);
                 if (noteIndex == -1) // rest
                 {
+                    // todo: put calls to midiManager somewhere more explicit
                     midiManager.NoteEvent(null);
                 }
                 else
@@ -136,19 +150,5 @@ class Instrument : Singleton<Instrument>
             if ((differenceKeymap & (noteInputMask | Keymap.S)) != Keymap.None)
             { changeCheckTime = time + checkTimeOffset; } // if note changed
         }
-    }
-
-
-    public void Update(Keymap newKeymap, double time)
-    {
-        // todo: assert that the length of combinations is the same as the length of notes
-
-        // update keymaps
-        differenceKeymap = newKeymap ^ keymap;
-        keymap = newKeymap;
-
-        UpdateOctave();
-        UpdateSharping();
-        UpdateNote(time);
     }
 }

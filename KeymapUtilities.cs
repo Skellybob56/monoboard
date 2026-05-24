@@ -1,6 +1,6 @@
 ﻿namespace Monoboard;
 
-static class Utilities
+static class KeymapUtilities
 {
     public static string KeymapToString(this Keymap keymap)
     {

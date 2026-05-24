@@ -17,7 +17,7 @@ static class MidiPortHandler
 		// create midi port with virtualMIDICreatePortEx2 from teVirtualMIDI64.dll
 		LpvmMidiPort = TEVirtualMidi.virtualMIDICreatePortEx2(portName, nint.Zero, nint.Zero, 65535, (uint)TEVirtualMidi.VmFlags.InstantiateTX);
 		if (!Active)
-		{ throw new Exception("Something went wrong with creating the virtual midi port"); }
+		{ throw new Exception("Something went wrong with creating the virtual midi port."); }
 	}
 
     public static void Dispose()

@@ -11,12 +11,6 @@ internal static class Program
     [DllImport("winmm.dll")]
     static extern uint timeEndPeriod(uint uPeriod);
 
-    static void Render()
-    {
-        ClearBackground(Color.Black);
-        DrawTextEx(GetFontDefault(), "Monoboard", new(12, 12), 20, 12, Color.White);
-    }
-
     // STAThread is required if you deploy using NativeAOT on Windows - See https://github.com/raylib-cs/raylib-cs/issues/301
     [System.STAThread]
     public static void Main()
@@ -51,5 +45,11 @@ internal static class Program
 
         CloseWindow();
         MidiManager.Destroy();
+    }
+
+    static void Render()
+    {
+        ClearBackground(Color.Black);
+        DrawTextEx(GetFontDefault(), "Monoboard", new(12, 12), 20, 12, Color.White);
     }
 }

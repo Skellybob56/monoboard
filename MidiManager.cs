@@ -10,12 +10,12 @@ class MidiManager : Singleton<MidiManager>
     const string midiDeviceName = "monoboard";
     readonly byte noteVelocity = 0x7F; // 7 bit int max
 
+    byte? playingNoteNumber;
+
     private MidiManager()
     {
         MidiPortHandler.Initialize(midiDeviceName);
     }
-
-    byte? playingNoteNumber;
     
     public void NoteEvent((int octave, int note)? noteData)
     {
