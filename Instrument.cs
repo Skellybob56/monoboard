@@ -5,22 +5,22 @@ class Instrument : Singleton<Instrument>
     public static Instrument Create(MidiManager midiManager)
     { return Register(new Instrument(midiManager)); }
 
-    const bool mirrorMode = true;
     const Keymap noteInputMask = Keymap.J | Keymap.K | Keymap.L | Keymap.C;
     const Keymap octaveShiftUpKey = Keymap.F;
     const Keymap octaveShiftDownKey = Keymap.D;
-    const Keymap octaveApplyKey = Keymap.S;
+    const Keymap sharpShiftKey = Keymap.S;
+    const Keymap octaveApplyKey = Keymap.P;
     const double checkTimeOffset = 1d / 16d; // in seconds
 
     readonly MidiManager midiManager;
 
     int octave = 5;
     Keymap keymap;
-    Keymap oldKeymap;
     Keymap differenceKeymap;
     double? changeCheckTime;
     bool octaveShiftedUp = false;
     bool octaveShiftedDown = false;
+    bool sharpShifted = false;
 
     Keymap[] combinations;
     sbyte[] notes;
@@ -66,7 +66,7 @@ class Instrument : Singleton<Instrument>
     private Instrument(MidiManager midiManager)
     {
         this.midiManager = midiManager;
-        (combinations, notes) = InitCombinationsAndScale(8, "LC03", "Dorian", 2);
+        (combinations, notes) = InitCombinationsAndScale(8, "LC03", "Mixolydian", 0);
     }
 
     void UpdateOctave()
@@ -105,6 +105,14 @@ class Instrument : Singleton<Instrument>
         }
     }
 
+    void UpdateSharping()
+    {
+        if (differenceKeymap.HasFlag(sharpShiftKey))
+        {
+            sharpShifted = keymap.HasFlag(sharpShiftKey);
+        }
+    }
+
     void UpdateNote(double time)
     {
         if (changeCheckTime.HasValue)
@@ -118,14 +126,14 @@ class Instrument : Singleton<Instrument>
                 }
                 else
                 {
-                    midiManager.NoteEvent((octave, notes[noteIndex]));
+                    midiManager.NoteEvent((octave, notes[noteIndex] + (sharpShifted? 1 : 0)));
                 }
                 changeCheckTime = null;
             }
         }
         else
         {
-            if ((differenceKeymap & noteInputMask) != Keymap.None)
+            if ((differenceKeymap & (noteInputMask | Keymap.S)) != Keymap.None)
             { changeCheckTime = time + checkTimeOffset; } // if note changed
         }
     }
@@ -136,12 +144,11 @@ class Instrument : Singleton<Instrument>
         // todo: assert that the length of combinations is the same as the length of notes
 
         // update keymaps
-        oldKeymap = keymap;
-        keymap = mirrorMode? (Keymap)Utilities.ReverseBits((byte)newKeymap) : newKeymap;
-        differenceKeymap = keymap ^ oldKeymap;
+        differenceKeymap = newKeymap ^ keymap;
+        keymap = newKeymap;
 
         UpdateOctave();
-
+        UpdateSharping();
         UpdateNote(time);
     }
 }
