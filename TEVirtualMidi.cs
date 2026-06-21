@@ -16,7 +16,7 @@ static partial class TEVirtualMidi
 	
 	[LibraryImport("teVirtualMIDI64.dll", EntryPoint = "virtualMIDISendData")]
 	[return: MarshalAs(UnmanagedType.Bool)]
-	public static partial bool virtualMIDISendData(nint lpvmMidiPort, [In] byte[] midiDataBytes, uint length);
+	public static partial bool virtualMIDISendData(nint lpvmMidiPort, ReadOnlySpan<byte> midiDataBytes, uint length);
 
 	[LibraryImport("teVirtualMIDI64.dll", EntryPoint = "virtualMIDICreatePortEx2", StringMarshalling = StringMarshalling.Utf16)]
 	public static partial nint virtualMIDICreatePortEx2(string portName, nint callback, nint callbackInstance, uint maxSysexLength, uint flags);
