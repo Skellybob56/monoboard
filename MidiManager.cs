@@ -8,7 +8,7 @@ class MidiManager : Singleton<MidiManager>
     { return Register(new MidiManager()); }
 
     const string midiDeviceName = "monoboard";
-    readonly byte noteVelocity = 0x7F; // 7 bit int max
+    const byte noteVelocity = 0x7F; // 7 bit int max
 
     byte? playingNoteNumber;
 
@@ -20,7 +20,7 @@ class MidiManager : Singleton<MidiManager>
     public void NoteEvent((int octave, int note)? noteData)
     {
         // todo: add testing to ensure octave and note are within legal ranges
-        if (!noteData.HasValue)
+        if (noteData is null)
         {
             if (!playingNoteNumber.HasValue)
             { return; } // attempted to stop playing a note while no note was playing
@@ -29,10 +29,13 @@ class MidiManager : Singleton<MidiManager>
             return;
         }
 
+        byte newNoteNumber = (byte)((noteData.Value.octave * 12 + noteData.Value.note) & 0x7F);
+        if (playingNoteNumber == newNoteNumber) { return; } // note is already playing
+
         if (playingNoteNumber.HasValue)
         { NoteOffEvent(playingNoteNumber.Value); }
 
-        playingNoteNumber = (byte)((noteData.Value.octave * 12 + noteData.Value.note) & 0x7F);
+        playingNoteNumber = newNoteNumber;
         NoteOnEvent(playingNoteNumber.Value, noteVelocity);
     }
 
