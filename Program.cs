@@ -11,22 +11,31 @@ internal static class Program
     [DllImport("winmm.dll")]
     static extern uint timeEndPeriod(uint uPeriod);
 
-    // STAThread is required if you deploy using NativeAOT on Windows - See https://github.com/raylib-cs/raylib-cs/issues/301
-    [System.STAThread]
-    public static void Main()
+    static Controller controller;
+    static MidiManager midiManager;
+    static Instrument instrument;
+
+    static Program()
     {
         InitWindow(220, 40, "Monoboard");
+        SetExitKey(KeyboardKey.Null);
+
         Font jetBrainsMonoFont = LoadFont("assets/JetBrainsMono-Regular.ttf");
 
-        Controller controller = Controller.Create();
-        MidiManager midiManager = MidiManager.Create();
-        Instrument instrument = Instrument.Create(midiManager);
+        controller = Controller.Create();
+        midiManager = MidiManager.Create();
+        instrument = Instrument.Create(midiManager);
 
         // populate the screen buffer
         BeginDrawing();
         Render();
         EndDrawing();
+    }
 
+    // STAThread is required if you deploy using NativeAOT on Windows - See https://github.com/raylib-cs/raylib-cs/issues/301
+    [System.STAThread]
+    public static void Main()
+    {
         timeBeginPeriod(1);
         while (!WindowShouldClose())
         {
@@ -36,8 +45,8 @@ internal static class Program
 
             // end of tick
             Thread.Sleep(1); // place the smallest frequency reduction on the loop that i can to prevent the loop from consuming an entire cpu thread
-            bool renderFrame = false;
-            if (renderFrame)
+            bool doRendering = false;
+            if (doRendering)
             { BeginDrawing(); Render(); EndDrawing(); } // EndDrawing handles PollInputEvents
             else { PollInputEvents(); }
         }
