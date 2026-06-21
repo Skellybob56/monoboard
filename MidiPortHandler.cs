@@ -20,7 +20,7 @@ static class MidiPortHandler
 		{ throw new Exception("Something went wrong with creating the virtual midi port."); }
 	}
 
-    public static void Dispose()
+	public static void Dispose()
 	{
 		if (!Active)
 		{
