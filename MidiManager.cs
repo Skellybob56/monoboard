@@ -19,20 +19,32 @@ class MidiManager : Singleton<MidiManager>
     
     public void NoteEvent((int octave, int note)? noteData)
     {
-        // todo: add testing to ensure octave and note are within legal ranges
         if (noteData is null)
+        { NoteEventDirect(null); return; } // null noteData: treat as a rest
+
+        int newNoteNumberInt = noteData.Value.octave * 12 + noteData.Value.note;
+        if (newNoteNumberInt < 0x00 || newNoteNumberInt > 0x7f)
+        { NoteEventDirect(null); return; } // note out of range: treat as a rest
+
+        NoteEventDirect((byte)newNoteNumberInt);
+    }
+
+    void NoteEventDirect(byte? newNoteNumber)
+    {
+        if (newNoteNumber is null)
         {
-            if (!playingNoteNumber.HasValue)
+            // note off
+            if (playingNoteNumber is null)
             { return; } // attempted to stop playing a note while no note was playing
             NoteOffEvent(playingNoteNumber.Value);
             playingNoteNumber = null;
             return;
         }
 
-        byte newNoteNumber = (byte)((noteData.Value.octave * 12 + noteData.Value.note) & 0x7F);
         if (playingNoteNumber == newNoteNumber) { return; } // note is already playing
 
-        if (playingNoteNumber.HasValue)
+        // note on
+        if (playingNoteNumber is not null)
         { NoteOffEvent(playingNoteNumber.Value); }
 
         playingNoteNumber = newNoteNumber;
