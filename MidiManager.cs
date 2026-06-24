@@ -10,7 +10,7 @@ class MidiManager : Singleton<MidiManager>
 	const string midiDeviceName = "monoboard";
 	const byte noteVelocity = 0x7F; // 7 bit int max
 
-	byte? playingNoteNumber;
+	byte? playingNote;
 
 	private MidiManager()
 	{
@@ -22,33 +22,33 @@ class MidiManager : Singleton<MidiManager>
 		if (noteData is null)
 		{ NoteEventDirect(null); return; } // null noteData: treat as a rest
 
-		int newNoteNumberInt = noteData.Value.octave * 12 + noteData.Value.note;
-		if (newNoteNumberInt < 0x00 || newNoteNumberInt > 0x7f)
+		int newNoteInt = noteData.Value.octave * 12 + noteData.Value.note;
+		if (newNoteInt < 0x00 || newNoteInt > 0x7f)
 		{ NoteEventDirect(null); return; } // note out of range: treat as a rest
 
-		NoteEventDirect((byte)newNoteNumberInt);
+		NoteEventDirect((byte)newNoteInt);
 	}
 
-	void NoteEventDirect(byte? newNoteNumber)
+	void NoteEventDirect(byte? newNote)
 	{
-		if (newNoteNumber is null)
+		if (newNote is null)
 		{
 			// note off
-			if (playingNoteNumber is null)
+			if (playingNote is null)
 			{ return; } // attempted to stop playing a note while no note was playing
-			NoteOffEvent(playingNoteNumber.Value);
-			playingNoteNumber = null;
+			NoteOffEvent(playingNote.Value);
+			playingNote = null;
 			return;
 		}
 
-		if (playingNoteNumber == newNoteNumber) { return; } // note is already playing
+		if (playingNote == newNote) { return; } // note is already playing
 
 		// note on
-		if (playingNoteNumber is not null)
-		{ NoteOffEvent(playingNoteNumber.Value); }
+		if (playingNote is not null)
+		{ NoteOffEvent(playingNote.Value); }
 
-		playingNoteNumber = newNoteNumber;
-		NoteOnEvent(playingNoteNumber.Value, noteVelocity);
+		playingNote = newNote;
+		NoteOnEvent(playingNote.Value, noteVelocity);
 	}
 
 	// todo: ensure safety when note or velocity are above 0x7F
