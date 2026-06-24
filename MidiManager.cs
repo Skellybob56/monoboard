@@ -1,4 +1,5 @@
-﻿using TEVirtualMidiBindingsCs;
+﻿using System.Diagnostics;
+using TEVirtualMidiBindingsCs;
 
 namespace Monoboard;
 
@@ -9,8 +10,9 @@ class MidiManager : Singleton<MidiManager>
 
 	const string midiDeviceName = "monoboard";
 	const byte noteVelocity = 0x7F; // 7 bit int max
+	const bool startNoteBeforeEndNote = true; // when swapping between two notes, this will start the next note before ending the last which can prevent monophonic clicking
 
-	byte? playingNote;
+	byte? playingNote = null;
 
 	private MidiManager()
 	{
@@ -31,15 +33,19 @@ class MidiManager : Singleton<MidiManager>
 
 	void NoteOnEvent(byte newNote)
 	{
+		Debug.Assert(newNote < 0x7F);
+
 		if (playingNote == newNote) { return; } // note is already playing
 
-		// note on
-		if (playingNote is not null)
-		{ NoteOffEvent(); }
+		if (!startNoteBeforeEndNote && playingNote is not null)
+		{ TEVirtualMidi.virtualMIDISendData(MidiPortHandler.LpvmMidiPort, [0x80, playingNote.Value, 0x00], 3); }
+
+		TEVirtualMidi.virtualMIDISendData(MidiPortHandler.LpvmMidiPort, [0x90, newNote, noteVelocity], 3);
+
+		if (startNoteBeforeEndNote && playingNote is not null)
+		{ TEVirtualMidi.virtualMIDISendData(MidiPortHandler.LpvmMidiPort, [0x80, playingNote.Value, 0x00], 3); }
 
 		playingNote = newNote;
-		// todo: ensure safety when note or velocity are above 0x7F
-		TEVirtualMidi.virtualMIDISendData(MidiPortHandler.LpvmMidiPort, [0x90, playingNote.Value, noteVelocity], 3);
 	}
 
 	void NoteOffEvent()
