@@ -67,7 +67,7 @@ class Instrument : Singleton<Instrument>
 	private Instrument(MidiManager midiManager)
 	{
 		this.midiManager = midiManager;
-		(combinations, notes) = InitCombinationsAndScale(8, "LC03", "Minor", 3);
+		(combinations, notes) = InitCombinationsAndScale(8, "Default", "Minor", 3);
 	}
 
 	public void Update(Keymap newKeymap, double time)
