@@ -9,6 +9,7 @@ static class FileReader
 
     public static Keymap[] GetCombinations(string filename)
     {
+        // todo: modernise this to not assume that the note input mask is 1111 0000
         string path = combinationsFolder + filename + combinationsExtention;
         StreamReader streamReader = new StreamReader(path);
 
@@ -26,7 +27,7 @@ static class FileReader
                 if (position == 3) // last digit in run
                 {
                     // add last digit
-                    if (character == '!') { currentKeymap |= Keymap.C; }
+                    if (character == '!') { currentKeymap |= Keymap.F; }
 
                     // append to array and clear currentKeymap
                     combinations.Add(currentKeymap.Value);
@@ -35,13 +36,13 @@ static class FileReader
                 }
                 if (character == '!')
                 {
-                    if (position == 2) { currentKeymap |= Keymap.L; }
-                    else if (position == 1) { currentKeymap |= Keymap.K; }
+                    if (position == 2) { currentKeymap |= Keymap.D; }
+                    else if (position == 1) { currentKeymap |= Keymap.S; }
                 }
             }
             else if (character == '.' || character == '!')
             {
-                currentKeymap = character == '!' ? Keymap.J : Keymap.None;
+                currentKeymap = character == '!' ? Keymap.A : Keymap.None;
                 position = 0;
             }
         }

@@ -5,10 +5,10 @@ class Instrument : Singleton<Instrument>
 	public static Instrument Create(MidiManager midiManager)
 	{ return Register(new Instrument(midiManager)); }
 
-	const Keymap noteInputMask = Keymap.J | Keymap.K | Keymap.L | Keymap.C;
-	const Keymap octaveShiftUpKey = Keymap.F;
-	const Keymap octaveShiftDownKey = Keymap.D;
-	const Keymap sharpShiftKey = Keymap.S;
+	const Keymap noteInputMask = Keymap.A | Keymap.S | Keymap.D | Keymap.F;
+	const Keymap octaveShiftUpKey = Keymap.J;
+	const Keymap octaveShiftDownKey = Keymap.K;
+	const Keymap sharpShiftKey = Keymap.L;
 	const Keymap octaveApplyKey = Keymap.P;
 	const double checkTimeOffset = 1d / 32d; // in seconds
 
@@ -46,10 +46,11 @@ class Instrument : Singleton<Instrument>
 
 		string DebugOutputOfSingleNote(Keymap combination, sbyte note)
 		{
+			// todo: use flat or sharp depending selected scale
 			const string noteDisplay = "C C#D D#E F F#G G#A A#B ";
 
-			// assumes that noteInputMask is 0000 1111
-			string combinationString = combination.KeymapToString().Substring(4);
+			// todo: generalize this as it assumes that noteInputMask is 1111 0000
+			string combinationString = combination.KeymapToString()[..4];
 
 			int tone = note;
 			int octave = 4;
@@ -66,7 +67,7 @@ class Instrument : Singleton<Instrument>
 	private Instrument(MidiManager midiManager)
 	{
 		this.midiManager = midiManager;
-		(combinations, notes) = InitCombinationsAndScale(8, "LC03", "Major", 2);
+		(combinations, notes) = InitCombinationsAndScale(8, "LC03", "Minor", 3);
 	}
 
 	public void Update(Keymap newKeymap, double time)
@@ -147,7 +148,7 @@ class Instrument : Singleton<Instrument>
 		}
 		else
 		{
-			if ((differenceKeymap & (noteInputMask | Keymap.S)) != Keymap.None)
+			if ((differenceKeymap & (noteInputMask | Keymap.L)) != Keymap.None)
 			{ changeCheckTime = time + checkTimeOffset; } // if note changed
 		}
 	}

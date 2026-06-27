@@ -20,7 +20,7 @@ enum Keymap : ushort
 
 class Controller : Singleton<Controller>
 {
-	const bool mirrorMode = true;
+	const bool mirrorMode = false;
 
 	public static Controller Create()
 	{ return Register(new Controller()); }
