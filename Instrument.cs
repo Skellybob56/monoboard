@@ -25,6 +25,12 @@ class Instrument : Singleton<Instrument>
 	Keymap[] combinations;
 	sbyte[] notes;
 
+	private Instrument(MidiManager midiManager)
+	{
+		this.midiManager = midiManager;
+		(combinations, notes) = InitCombinationsAndScale(8, "Default", "Dorian", 3);
+	}
+
 	static (Keymap[] combinations, sbyte[] notes) InitCombinationsAndScale(int scaleSize, string combinationsFilename, string notesFilename, int rootNote)
 	{
 		string sizePrefix = scaleSize.ToString() + " - ";
@@ -62,12 +68,6 @@ class Instrument : Singleton<Instrument>
 
 			return new string(combinationString.Reverse().ToArray()) + $" {toneString}{octave} " + combinationString;
 		}
-	}
-
-	private Instrument(MidiManager midiManager)
-	{
-		this.midiManager = midiManager;
-		(combinations, notes) = InitCombinationsAndScale(8, "Default", "Minor", 3);
 	}
 
 	public void Update(Keymap newKeymap, double time)
