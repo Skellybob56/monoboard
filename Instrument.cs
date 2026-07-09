@@ -5,12 +5,13 @@ class Instrument : Singleton<Instrument>
 	public static Instrument Create(MidiManager midiManager)
 	{ return Register(new Instrument(midiManager)); }
 
+	const double checkTimeOffset = 1d / 16d; // in seconds
+
 	const Keymap noteInputMask = Keymap.A | Keymap.S | Keymap.D | Keymap.F;
-	const Keymap octaveShiftUpKey = Keymap.J;
-	const Keymap octaveShiftDownKey = Keymap.K;
-	const Keymap sharpShiftKey = Keymap.L;
-	const Keymap octaveApplyKey = Keymap.P;
-	const double checkTimeOffset = 1d / 32d; // in seconds
+	const Keymap octaveShiftUpKey = Keymap.Up;
+	const Keymap octaveShiftDownKey = Keymap.Down;
+	const Keymap sharpShiftKey = Keymap.Sharp;
+	const Keymap octaveApplyKey = Keymap.ShiftOctave;
 
 	readonly MidiManager midiManager;
 
@@ -148,7 +149,7 @@ class Instrument : Singleton<Instrument>
 		}
 		else
 		{
-			if ((differenceKeymap & (noteInputMask | Keymap.L)) != Keymap.None)
+			if ((differenceKeymap & (noteInputMask | Keymap.Sharp)) != Keymap.None)
 			{ changeCheckTime = time + checkTimeOffset; } // if note changed
 		}
 	}
