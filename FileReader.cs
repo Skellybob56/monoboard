@@ -1,4 +1,6 @@
-﻿namespace Monoboard;
+﻿using static Monoboard.KeymapUtil;
+
+namespace Monoboard;
 
 static class FileReader
 {

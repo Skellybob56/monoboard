@@ -1,24 +1,8 @@
 ﻿using Raylib_cs;
 using static Raylib_cs.Raylib;
+using static Monoboard.KeymapUtil;
 
 namespace Monoboard;
-
-// todo: make this a struct to centralise computation
-[Flags]
-enum Keymap : byte
-{
-	None = 0x00,
-
-	A = 0x01,
-	S = 0x02,
-	D = 0x04,
-	F = 0x08,
-
-	Up = 0x10,
-	Down = 0x20,
-	Sharp = 0x40,
-	ShiftOctave = 0x80
-}
 
 class Controller : Singleton<Controller>
 {
