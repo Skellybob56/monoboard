@@ -27,7 +27,7 @@ class Controller : Singleton<Controller>
 		if (IsKeyDown(KeyboardKey.L)) { keymap |= mirrorMode? Keymap.S : Keymap.Sharp; }
 		if (mirrorMode && IsKeyDown(KeyboardKey.Semicolon)) { keymap |= Keymap.A; }
 
-		if (IsKeyDown(KeyboardKey.Space)) { keymap |= Keymap.ShiftOctave; }
+		if (IsKeyDown(KeyboardKey.Space)) { keymap |= Keymap.ApplyOctave; }
 
 		return keymap;
 	}

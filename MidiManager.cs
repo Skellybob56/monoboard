@@ -9,7 +9,7 @@ class MidiManager : Singleton<MidiManager>
 	{ return Register(new MidiManager()); }
 
 	const string midiDeviceName = "monoboard";
-	const byte noteVelocity = 0x7F; // 7 bit int max
+	const byte noteVelocity = 80; // limited to a 7 bit integer (80 is considered mf in musical volume)
 	const bool startNoteBeforeEndNote = true; // when swapping between two notes, this will start the next note before ending the last which can prevent monophonic clicking
 
 	byte? playingNote = null;

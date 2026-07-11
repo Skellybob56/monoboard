@@ -7,17 +7,12 @@ class Instrument : Singleton<Instrument>
 	public static Instrument Create(MidiManager midiManager)
 	{ return Register(new Instrument(midiManager)); }
 
-	const double checkTimeOffset = 1d / 16d; // in seconds
-
-	const Keymap noteInputMask = Keymap.A | Keymap.S | Keymap.D | Keymap.F;
-	const Keymap octaveShiftUpKey = Keymap.Up;
-	const Keymap octaveShiftDownKey = Keymap.Down;
-	const Keymap sharpShiftKey = Keymap.Sharp;
-	const Keymap octaveApplyKey = Keymap.ShiftOctave;
+	// todo: add a smaller `checkTimeOffset` variant that only applies if there are no note keys pressed in the early window (in other words, check for no note keys pressed before the check time and start the rest early if detected)
+	const double checkTimeOffset = 1d / 32d; // in seconds
 
 	readonly MidiManager midiManager;
 
-	int octave = 5;
+	int baseOctave = 4;
 	Keymap keymap;
 	Keymap differenceKeymap;
 	double? changeCheckTime;
@@ -31,7 +26,7 @@ class Instrument : Singleton<Instrument>
 	private Instrument(MidiManager midiManager)
 	{
 		this.midiManager = midiManager;
-		(combinations, notes) = InitCombinationsAndScale(8, "Default", "Dorian", 3);
+		(combinations, notes) = InitCombinationsAndScale(8, "Default", "Major", 2);
 	}
 
 	static (Keymap[] combinations, sbyte[] notes) InitCombinationsAndScale(int scaleSize, string combinationsFilename, string notesFilename, int rootNote)
@@ -88,45 +83,20 @@ class Instrument : Singleton<Instrument>
 
 	void UpdateOctave()
 	{
-		// todo: reduce repetiton
-		if (differenceKeymap.HasFlag(octaveShiftUpKey))
+		octaveShiftedUp = keymap.HasFlag(Keymap.Up);
+		octaveShiftedDown = keymap.HasFlag(Keymap.Down);
+
+		if (differenceKeymap.HasFlag(Keymap.ApplyOctave) && keymap.HasFlag(Keymap.ApplyOctave))
 		{
-			if (keymap.HasFlag(octaveShiftUpKey) && !octaveShiftedUp)
-			{
-				octave += 1;
-				octaveShiftedUp = true;
-			}
-			else if (octaveShiftedUp)
-			{
-				octave -= 1;
-				octaveShiftedUp = false;
-			}
-		}
-		if (differenceKeymap.HasFlag(octaveShiftDownKey))
-		{
-			if (keymap.HasFlag(octaveShiftDownKey) && !octaveShiftedDown)
-			{
-				octave -= 1;
-				octaveShiftedDown = true;
-			}
-			else if (octaveShiftedDown)
-			{
-				octave += 1;
-				octaveShiftedDown = false;
-			}
-		}
-		if (differenceKeymap.HasFlag(octaveApplyKey) && keymap.HasFlag(octaveApplyKey))
-		{
-			octaveShiftedUp = false;
-			octaveShiftedDown = false;
+			baseOctave += (octaveShiftedUp? 1 : 0) + (octaveShiftedDown? -1 : 0);
 		}
 	}
 
 	void UpdateSharping()
 	{
-		if (differenceKeymap.HasFlag(sharpShiftKey))
+		if (differenceKeymap.HasFlag(Keymap.Sharp))
 		{
-			sharpShifted = keymap.HasFlag(sharpShiftKey);
+			sharpShifted = keymap.HasFlag(Keymap.Sharp);
 		}
 	}
 
@@ -136,7 +106,7 @@ class Instrument : Singleton<Instrument>
 		{
 			if (changeCheckTime <= time)
 			{
-				int noteIndex = Array.IndexOf(combinations, keymap & noteInputMask);
+				int noteIndex = Array.IndexOf(combinations, keymap & Keymap.Notes);
 				if (noteIndex == -1) // rest
 				{
 					// todo: put calls to midiManager somewhere more explicit
@@ -144,14 +114,16 @@ class Instrument : Singleton<Instrument>
 				}
 				else
 				{
-					midiManager.NoteEvent((octave, notes[noteIndex] + (sharpShifted? 1 : 0)));
+					int note = notes[noteIndex] + (sharpShifted? 1 : 0);
+					int octave = baseOctave + (octaveShiftedUp? 1 : 0) + (octaveShiftedDown? -1 : 0);
+					midiManager.NoteEvent((octave, note));
 				}
 				changeCheckTime = null;
 			}
 		}
 		else
 		{
-			if ((differenceKeymap & (noteInputMask | Keymap.Sharp)) != Keymap.None)
+			if ((differenceKeymap & Keymap.NoteModifers) != Keymap.None)
 			{ changeCheckTime = time + checkTimeOffset; } // if note changed
 		}
 	}

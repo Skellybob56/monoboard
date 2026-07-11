@@ -15,7 +15,11 @@ static class KeymapUtil
 		Up = 0x10,
 		Down = 0x20,
 		Sharp = 0x40,
-		ShiftOctave = 0x80
+		ApplyOctave = 0x80,
+
+		Notes = 0x0f,
+		Modifiers = 0x70,
+		NoteModifers = Notes | Modifiers
 	}
 
 	public static string KeymapToString(this Keymap keymap)
