@@ -13,12 +13,12 @@ class Instrument : Singleton<Instrument>
 	readonly MidiManager midiManager;
 
 	int baseOctave = 4;
+	int octaveShift = 0;
+	int noteShift = 0;
+
 	Keymap keymap;
 	Keymap differenceKeymap;
 	double? changeCheckTime;
-	bool octaveShiftedUp = false;
-	bool octaveShiftedDown = false;
-	bool sharpShifted = false;
 
 	Keymap[] combinations;
 	sbyte[] notes;
@@ -76,28 +76,17 @@ class Instrument : Singleton<Instrument>
 		differenceKeymap = newKeymap ^ keymap;
 		keymap = newKeymap;
 
-		UpdateOctave();
-		UpdateSharping();
-		UpdateNote(time);
-	}
+		// update shifts
+		noteShift = keymap.HasFlag(Keymap.Sharp)? 1 : 0;
+		octaveShift = (keymap.HasFlag(Keymap.Up)? 1 : 0) + (keymap.HasFlag(Keymap.Down)? -1 : 0);
 
-	void UpdateOctave()
-	{
-		octaveShiftedUp = keymap.HasFlag(Keymap.Up);
-		octaveShiftedDown = keymap.HasFlag(Keymap.Down);
-
+		// update base octave
 		if (differenceKeymap.HasFlag(Keymap.ApplyOctave) && keymap.HasFlag(Keymap.ApplyOctave))
 		{
-			baseOctave += (octaveShiftedUp? 1 : 0) + (octaveShiftedDown? -1 : 0);
+			baseOctave += octaveShift;
 		}
-	}
 
-	void UpdateSharping()
-	{
-		if (differenceKeymap.HasFlag(Keymap.Sharp))
-		{
-			sharpShifted = keymap.HasFlag(Keymap.Sharp);
-		}
+		UpdateNote(time);
 	}
 
 	void UpdateNote(double time)
@@ -114,8 +103,8 @@ class Instrument : Singleton<Instrument>
 				}
 				else
 				{
-					int note = notes[noteIndex] + (sharpShifted? 1 : 0);
-					int octave = baseOctave + (octaveShiftedUp? 1 : 0) + (octaveShiftedDown? -1 : 0);
+					int note = notes[noteIndex] + noteShift;
+					int octave = baseOctave + octaveShift;
 					midiManager.NoteEvent((octave, note));
 				}
 				changeCheckTime = null;
