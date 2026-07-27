@@ -15,21 +15,27 @@ internal static class Program
 	static Controller controller;
 	static MidiManager midiManager;
 	static Instrument instrument;
+	static Renderer renderer;
+
+	public static Font font;
+
+	static bool updateGraphics = false;
 
 	static Program()
 	{
-		InitWindow(220, 40, "Monoboard");
+		InitWindow(400, 160, "Monoboard");
 		SetExitKey(KeyboardKey.Null);
 
-		Font jetBrainsMonoFont = LoadFont("assets/JetBrainsMono-Regular.ttf");
+		font = LoadFontEx("assets/LibreBaskerville-VariableFont_wght.ttf", 32, ['M', 'O', 'N', 'B', 'A', 'R', 'D', 'S', 'F', 'J', 'K', 'L', ';'], 13);
 
 		controller = Controller.Create();
 		midiManager = MidiManager.Create();
 		instrument = Instrument.Create(midiManager);
+		renderer = Renderer.Create();
 
 		// populate the screen buffer
 		BeginDrawing();
-		Render();
+		renderer.Render();
 		EndDrawing();
 	}
 
@@ -46,20 +52,21 @@ internal static class Program
 
 			// end of tick
 			Thread.Sleep(1); // place the smallest frequency reduction on the loop that i can to prevent the loop from consuming an entire cpu thread
-			bool doRendering = false;
-			if (doRendering)
-			{ BeginDrawing(); Render(); EndDrawing(); } // EndDrawing handles PollInputEvents
+			if (updateGraphics)
+			{ BeginDrawing(); renderer.Render(); EndDrawing(); updateGraphics = false; } // EndDrawing handles PollInputEvents
 			else { PollInputEvents(); }
 		}
 		timeEndPeriod(1);
 
 		CloseWindow();
+		Controller.Destroy();
 		MidiManager.Destroy();
+		Instrument.Destroy();
+		Renderer.Destroy();
 	}
 
-	static void Render()
+	public static void ScheduleGraphicalUpdate()
 	{
-		ClearBackground(Color.Black);
-		DrawTextEx(GetFontDefault(), "Monoboard", new(12, 12), 20, 12, Color.White);
+		updateGraphics = true;
 	}
 }

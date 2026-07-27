@@ -73,8 +73,8 @@ class Instrument : Singleton<Instrument>
 		// todo: assert that the length of combinations is the same as the length of notes
 
 		// update keymaps
-		differenceKeymap = Controller.Keymap ^ keymap;
-		keymap = Controller.Keymap;
+		differenceKeymap = Controller.CurrentKeymap ^ keymap;
+		keymap = Controller.CurrentKeymap;
 
 		// update shifts
 		noteShift = keymap.HasFlag(Keymap.Sharp)? 1 : 0;
