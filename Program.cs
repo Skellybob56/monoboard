@@ -17,16 +17,17 @@ internal static class Program
 	static Instrument instrument;
 	static Renderer renderer;
 
-	public static Font font;
+	public static readonly Font font;
+	public const int fontSize = 48;
 
 	static bool updateGraphics = false;
 
 	static Program()
 	{
-		InitWindow(400, 160, "Monoboard");
+		InitWindow(600, 240, "Monoboard");
 		SetExitKey(KeyboardKey.Null);
 
-		font = LoadFontEx("assets/LibreBaskerville-VariableFont_wght.ttf", 32, ['M', 'O', 'N', 'B', 'A', 'R', 'D', 'S', 'F', 'J', 'K', 'L', ';'], 13);
+		font = LoadFontEx("assets/LibreBaskerville-VariableFont_wght.ttf", fontSize, ['M', 'O', 'N', 'B', 'A', 'R', 'D', 'S', 'F', 'J', 'K', 'L', ';'], 13);
 
 		controller = Controller.Create();
 		midiManager = MidiManager.Create();
