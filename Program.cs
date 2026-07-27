@@ -40,8 +40,8 @@ internal static class Program
 		timeBeginPeriod(1);
 		while (!WindowShouldClose())
 		{
-			Keymap latestKeymap = controller.GetKeymap();
-			instrument.Update(latestKeymap, GetTime());
+			controller.UpdateKeymap();
+			instrument.Update(GetTime());
 
 
 			// end of tick

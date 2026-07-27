@@ -68,13 +68,13 @@ class Instrument : Singleton<Instrument>
 		}
 	}
 
-	public void Update(Keymap newKeymap, double time)
+	public void Update(double time)
 	{
 		// todo: assert that the length of combinations is the same as the length of notes
 
 		// update keymaps
-		differenceKeymap = newKeymap ^ keymap;
-		keymap = newKeymap;
+		differenceKeymap = Controller.Keymap ^ keymap;
+		keymap = Controller.Keymap;
 
 		// update shifts
 		noteShift = keymap.HasFlag(Keymap.Sharp)? 1 : 0;

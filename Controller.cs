@@ -6,29 +6,28 @@ namespace Monoboard;
 
 class Controller : Singleton<Controller>
 {
-	const bool mirrorMode = false;
+	public static bool MirrorMode { get; private set; } = false;
+	public static Keymap Keymap { get; private set; }
 
 	public static Controller Create()
 	{ return Register(new Controller()); }
 
 	private Controller() { }
 
-	public Keymap GetKeymap()
+	public void UpdateKeymap()
 	{
-		Keymap keymap = Keymap.None;
+		Keymap = Keymap.None;
 
-		if (!mirrorMode && IsKeyDown(KeyboardKey.A)) { keymap |= Keymap.A; }
-		if (IsKeyDown(KeyboardKey.S)) { keymap |= mirrorMode? Keymap.Sharp : Keymap.S; }
-		if (IsKeyDown(KeyboardKey.D)) { keymap |= mirrorMode? Keymap.Down : Keymap.D; }
-		if (IsKeyDown(KeyboardKey.F)) { keymap |= mirrorMode? Keymap.Up : Keymap.F; }
+		if (!MirrorMode && IsKeyDown(KeyboardKey.A)) { Keymap |= Keymap.A; }
+		if (IsKeyDown(KeyboardKey.S)) { Keymap |= MirrorMode? Keymap.Sharp : Keymap.S; }
+		if (IsKeyDown(KeyboardKey.D)) { Keymap |= MirrorMode? Keymap.Down : Keymap.D; }
+		if (IsKeyDown(KeyboardKey.F)) { Keymap |= MirrorMode? Keymap.Up : Keymap.F; }
 
-		if (IsKeyDown(KeyboardKey.J)) { keymap |= mirrorMode? Keymap.F : Keymap.Up; }
-		if (IsKeyDown(KeyboardKey.K)) { keymap |= mirrorMode? Keymap.D : Keymap.Down; }
-		if (IsKeyDown(KeyboardKey.L)) { keymap |= mirrorMode? Keymap.S : Keymap.Sharp; }
-		if (mirrorMode && IsKeyDown(KeyboardKey.Semicolon)) { keymap |= Keymap.A; }
+		if (IsKeyDown(KeyboardKey.J)) { Keymap |= MirrorMode? Keymap.F : Keymap.Up; }
+		if (IsKeyDown(KeyboardKey.K)) { Keymap |= MirrorMode? Keymap.D : Keymap.Down; }
+		if (IsKeyDown(KeyboardKey.L)) { Keymap |= MirrorMode? Keymap.S : Keymap.Sharp; }
+		if (MirrorMode && IsKeyDown(KeyboardKey.Semicolon)) { Keymap |= Keymap.A; }
 
-		if (IsKeyDown(KeyboardKey.Space)) { keymap |= Keymap.ApplyOctave; }
-
-		return keymap;
+		if (IsKeyDown(KeyboardKey.Space)) { Keymap |= Keymap.ApplyOctave; }
 	}
 }
