@@ -24,7 +24,7 @@ internal static class Program
 
 	static Program()
 	{
-		InitWindow(650, 240, "Monoboard");
+		InitWindow(Renderer.screenWidth, Renderer.screenHeight, "Monoboard");
 		SetExitKey(KeyboardKey.Null);
 
 		font = LoadFontEx("assets/LibreBaskerville-VariableFont_wght.ttf", fontSize, ['M', 'O', 'N', 'B', 'A', 'R', 'D', 'S', 'F', 'J', 'K', 'L', ';'], 13);

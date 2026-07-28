@@ -13,6 +13,11 @@ class Renderer : Singleton<Renderer>
 
 	// inputs
 	static readonly Color backgroundColor = Color.Black;
+	static readonly Color dividerColor = Color.Gray;
+	static readonly Color logoColor = Color.White;
+	static readonly Color keyColor = Color.White;
+	static readonly Color keyPressedColor = Color.Gray;
+
 	const int defaultMargin = 12;
 
 	const int noteScaleWindowWidth = 64;
@@ -23,8 +28,6 @@ class Renderer : Singleton<Renderer>
 	const int keyBoxHeight = 48;
 	const int keyBoxSpacing = 15;
 	const int keyPressedSink = 6;
-	static readonly Color keyColor = Color.White;
-	static readonly Color keyPressedColor = Color.Gray;
 
 	// maths
 	const int logoTextX = defaultMargin + noteScaleWindowWidth;
@@ -37,10 +40,17 @@ class Renderer : Singleton<Renderer>
 	const int spacebarY = keySetY + keyBoxHeight + defaultMargin;
 	const int spacebarWidth = 9*keyBoxWidth + 8*keyBoxSpacing;
 
+	public const int screenWidth = keySetX + spacebarWidth + defaultMargin;
+	public const int screenHeight = spacebarY + keyBoxHeight + defaultMargin;
+
 	public void Render()
 	{
+		DrawLine(noteScaleWindowWidth, 0, noteScaleWindowWidth, screenHeight, dividerColor);
+
 		ClearBackground(backgroundColor);
-		DrawTextEx(Program.font, "MONOBOARD", new(logoTextX, logoTextY), Program.fontSize, 30, Color.White);
+		DrawTextEx(Program.font, "MONOBOARD", new(logoTextX, logoTextY), Program.fontSize, 30, logoColor);
+
+		DrawLine(noteScaleWindowWidth, logoTextY + logoHeight, noteScaleWindowWidth + defaultMargin + spacebarWidth + defaultMargin, logoTextY + logoHeight, dividerColor);
 
 		DrawKey(keySetX + 0*keyBoxJump, keySetY, Glyph.A, Controller.CurrentKeymap.HasFlag(KeymapUtil.Keymap.A));
 		DrawKey(keySetX + 1*keyBoxJump, keySetY, Glyph.S, Controller.CurrentKeymap.HasFlag(KeymapUtil.Keymap.S));
