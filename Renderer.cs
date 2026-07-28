@@ -11,39 +11,47 @@ class Renderer : Singleton<Renderer>
 
 	private Renderer() { }
 
+	// inputs
+	const int defaultMargin = 12;
+
 	const int noteScaleWindowWidth = 64;
 
-	const int logoTextPositionX = 15 + noteScaleWindowWidth;
-	const int logoTextPositionY = 12;
+	const int logoHeight = Program.fontSize;
 
-	const int keySet1Start = 12 + noteScaleWindowWidth;
 	const int keyBoxWidth = 48;
 	const int keyBoxHeight = 48;
 	const int keyBoxSpacing = 15;
 	const int keyPressedSink = 6;
-	readonly Color keyColor = Color.White;
-	readonly Color keyPressedColor = Color.Gray;
+	static readonly Color keyColor = Color.White;
+	static readonly Color keyPressedColor = Color.Gray;
 
+	// maths
+	const int logoTextX = defaultMargin + noteScaleWindowWidth;
+	const int logoTextY = defaultMargin;
+
+	const int keySetX = defaultMargin + noteScaleWindowWidth;
+	const int keySetY = logoTextY + logoHeight + defaultMargin;
 	const int keyBoxJump = keyBoxSpacing + keyBoxWidth;
-	const int keySet2Start = keySet1Start + 5*keyBoxJump;
-	const int fullKeysetWidth = 9*keyBoxWidth + 8*keyBoxSpacing;
+
+	const int spacebarY = keySetY + keyBoxHeight + defaultMargin;
+	const int spacebarWidth = 9*keyBoxWidth + 8*keyBoxSpacing;
 
 	public void Render()
 	{
 		ClearBackground(Color.Black);
-		DrawTextEx(Program.font, "MONOBOARD", new(logoTextPositionX, logoTextPositionY), Program.fontSize, 30, Color.White);
+		DrawTextEx(Program.font, "MONOBOARD", new(logoTextX, logoTextY), Program.fontSize, 30, Color.White);
 
-		DrawKey(keySet1Start + 0*keyBoxJump, 72, Glyph.A, Controller.CurrentKeymap.HasFlag(KeymapUtil.Keymap.A));
-		DrawKey(keySet1Start + 1*keyBoxJump, 72, Glyph.S, Controller.CurrentKeymap.HasFlag(KeymapUtil.Keymap.S));
-		DrawKey(keySet1Start + 2*keyBoxJump, 72, Glyph.D, Controller.CurrentKeymap.HasFlag(KeymapUtil.Keymap.D));
-		DrawKey(keySet1Start + 3*keyBoxJump, 72, Glyph.F, Controller.CurrentKeymap.HasFlag(KeymapUtil.Keymap.F));
+		DrawKey(keySetX + 0*keyBoxJump, keySetY, Glyph.A, Controller.CurrentKeymap.HasFlag(KeymapUtil.Keymap.A));
+		DrawKey(keySetX + 1*keyBoxJump, keySetY, Glyph.S, Controller.CurrentKeymap.HasFlag(KeymapUtil.Keymap.S));
+		DrawKey(keySetX + 2*keyBoxJump, keySetY, Glyph.D, Controller.CurrentKeymap.HasFlag(KeymapUtil.Keymap.D));
+		DrawKey(keySetX + 3*keyBoxJump, keySetY, Glyph.F, Controller.CurrentKeymap.HasFlag(KeymapUtil.Keymap.F));
+		// one key-sized gap here to split ASDF from JKL;
+		DrawKey(keySetX + 5*keyBoxJump, keySetY, Glyph.J, Controller.CurrentKeymap.HasFlag(KeymapUtil.Keymap.Up));
+		DrawKey(keySetX + 6*keyBoxJump, keySetY, Glyph.K, Controller.CurrentKeymap.HasFlag(KeymapUtil.Keymap.Down));
+		DrawKey(keySetX + 7*keyBoxJump, keySetY, Glyph.L, Controller.CurrentKeymap.HasFlag(KeymapUtil.Keymap.Sharp));
+		DrawKey(keySetX + 8*keyBoxJump, keySetY, Glyph.Semicolon, false);
 
-		DrawKey(keySet2Start + 0*keyBoxJump, 72, Glyph.J, Controller.CurrentKeymap.HasFlag(KeymapUtil.Keymap.Up));
-		DrawKey(keySet2Start + 1*keyBoxJump, 72, Glyph.K, Controller.CurrentKeymap.HasFlag(KeymapUtil.Keymap.Down));
-		DrawKey(keySet2Start + 2*keyBoxJump, 72, Glyph.L, Controller.CurrentKeymap.HasFlag(KeymapUtil.Keymap.Sharp));
-		DrawKey(keySet2Start + 3*keyBoxJump, 72, Glyph.Semicolon, false);
-
-		DrawSpace(keySet1Start, 132, Controller.CurrentKeymap.HasFlag(KeymapUtil.Keymap.ApplyOctave));
+		DrawSpace(keySetX, spacebarY, Controller.CurrentKeymap.HasFlag(KeymapUtil.Keymap.ApplyOctave));
 	}
 
 	void DrawKey(int x, int y, Glyph glyph, bool pressed)
@@ -92,6 +100,6 @@ class Renderer : Singleton<Renderer>
 	void DrawSpace(int x, int y, bool pressed)
 	{
 		int yOffset = pressed? keyPressedSink : 0;
-		DrawRectangleLines(x, y + yOffset, fullKeysetWidth, keyBoxHeight, pressed? keyPressedColor : keyColor);
+		DrawRectangleLines(x, y + yOffset, spacebarWidth, keyBoxHeight, pressed? keyPressedColor : keyColor);
 	}
 }
