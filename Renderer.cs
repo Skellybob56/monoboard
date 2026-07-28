@@ -62,22 +62,6 @@ class Renderer : Singleton<Renderer>
 		DrawGlyph(x, y + yOffset, glyph, pressed? keyPressedColor : keyColor);
 	}
 
-	enum Glyph : byte
-	{
-		A, S, D, F,
-		J, K, L, Semicolon
-	}
-
-	static char GlyphToChar(Glyph glyph)
-	{
-		return glyph switch
-		{
-			Glyph.A => 'A', Glyph.S => 'S', Glyph.D => 'D', Glyph.F => 'F',
-			Glyph.J => 'J', Glyph.K => 'K', Glyph.L => 'L', Glyph.Semicolon => ';',
-			_ => throw new ArgumentException("Glyph enum value not recognized.", nameof(glyph))
-		};
-	}
-
 	static void DrawGlyph(int x, int y, Glyph glyph, Color color)
 	{
 		char character = GlyphToChar(glyph);
@@ -108,5 +92,21 @@ class Renderer : Singleton<Renderer>
 	{
 		DrawRectangle(x, y, width, height, outlineColor);
 		DrawRectangle(x + outlineThickness, y + outlineThickness, width-(2*outlineThickness), height-(2*outlineThickness), fillColor);
+	}
+
+	enum Glyph : byte
+	{
+		A, S, D, F,
+		J, K, L, Semicolon
+	}
+
+	static char GlyphToChar(Glyph glyph)
+	{
+		return glyph switch
+		{
+			Glyph.A => 'A', Glyph.S => 'S', Glyph.D => 'D', Glyph.F => 'F',
+			Glyph.J => 'J', Glyph.K => 'K', Glyph.L => 'L', Glyph.Semicolon => ';',
+			_ => throw new ArgumentException("Glyph enum value not recognized.", nameof(glyph))
+		};
 	}
 }
