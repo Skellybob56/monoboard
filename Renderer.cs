@@ -85,7 +85,15 @@ class Renderer : Singleton<Renderer>
 	void DrawSpace(int x, int y, bool pressed)
 	{
 		int yOffset = pressed? keyPressedSink : 0;
-		DrawOutlinedBox(x, y + yOffset, spacebarWidth, keyBoxHeight, pressed? keyPressedColor : keyColor, 1, backgroundColor);
+		Color currentKeyColor = pressed? keyPressedColor : keyColor;
+		DrawOutlinedBox(x, y + yOffset, spacebarWidth, keyBoxHeight, currentKeyColor, 1, backgroundColor);
+
+		const int spacebarGlyphMarginX = 20;
+		const int spacebarGlyphMarginY = 16;
+		const int spacebarGlyphWidth = spacebarWidth - (2*spacebarGlyphMarginX);
+		const int spacebarGlyphHeight = 18;
+		DrawRectangle(x + spacebarGlyphMarginX, y + yOffset + spacebarGlyphMarginY, spacebarGlyphWidth, spacebarGlyphHeight, currentKeyColor);
+		DrawRectangle(x + spacebarGlyphMarginX + 1, y + yOffset + spacebarGlyphMarginY, spacebarGlyphWidth-2, spacebarGlyphHeight-1, backgroundColor);
 	}
 
 	static void DrawOutlinedBox(int x, int y, int width, int height, Color outlineColor, int outlineThickness, Color fillColor)
