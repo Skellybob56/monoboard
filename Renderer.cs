@@ -11,7 +11,12 @@ class Renderer : Singleton<Renderer>
 
 	private Renderer() { }
 
-	const int keySet1Start = 12;
+	const int noteScaleWindowWidth = 64;
+
+	const int logoTextPositionX = 15 + noteScaleWindowWidth;
+	const int logoTextPositionY = 12;
+
+	const int keySet1Start = 12 + noteScaleWindowWidth;
 	const int keyBoxWidth = 48;
 	const int keyBoxHeight = 48;
 	const int keyBoxSpacing = 15;
@@ -26,7 +31,7 @@ class Renderer : Singleton<Renderer>
 	public void Render()
 	{
 		ClearBackground(Color.Black);
-		DrawTextEx(Program.font, "MONOBOARD", new(15, 12), Program.fontSize, 30, Color.White);
+		DrawTextEx(Program.font, "MONOBOARD", new(logoTextPositionX, logoTextPositionY), Program.fontSize, 30, Color.White);
 
 		DrawKey(keySet1Start + 0*keyBoxJump, 72, Glyph.A, Controller.CurrentKeymap.HasFlag(KeymapUtil.Keymap.A));
 		DrawKey(keySet1Start + 1*keyBoxJump, 72, Glyph.S, Controller.CurrentKeymap.HasFlag(KeymapUtil.Keymap.S));
