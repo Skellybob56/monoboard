@@ -12,6 +12,7 @@ class Renderer : Singleton<Renderer>
 	private Renderer() { }
 
 	// inputs
+	static readonly Color backgroundColor = Color.Black;
 	const int defaultMargin = 12;
 
 	const int noteScaleWindowWidth = 64;
@@ -38,7 +39,7 @@ class Renderer : Singleton<Renderer>
 
 	public void Render()
 	{
-		ClearBackground(Color.Black);
+		ClearBackground(backgroundColor);
 		DrawTextEx(Program.font, "MONOBOARD", new(logoTextX, logoTextY), Program.fontSize, 30, Color.White);
 
 		DrawKey(keySetX + 0*keyBoxJump, keySetY, Glyph.A, Controller.CurrentKeymap.HasFlag(KeymapUtil.Keymap.A));
@@ -57,7 +58,7 @@ class Renderer : Singleton<Renderer>
 	void DrawKey(int x, int y, Glyph glyph, bool pressed)
 	{
 		int yOffset = pressed? keyPressedSink : 0;
-		DrawRectangleLines(x, y + yOffset, keyBoxWidth, keyBoxHeight, pressed? keyPressedColor : keyColor);
+		DrawOutlinedBox(x, y + yOffset, keyBoxWidth, keyBoxHeight, pressed? keyPressedColor : keyColor, 1, backgroundColor);
 		DrawGlyph(x, y + yOffset, glyph, pressed? keyPressedColor : keyColor);
 	}
 
@@ -100,6 +101,12 @@ class Renderer : Singleton<Renderer>
 	void DrawSpace(int x, int y, bool pressed)
 	{
 		int yOffset = pressed? keyPressedSink : 0;
-		DrawRectangleLines(x, y + yOffset, spacebarWidth, keyBoxHeight, pressed? keyPressedColor : keyColor);
+		DrawOutlinedBox(x, y + yOffset, spacebarWidth, keyBoxHeight, pressed? keyPressedColor : keyColor, 1, backgroundColor);
+	}
+
+	static void DrawOutlinedBox(int x, int y, int width, int height, Color outlineColor, int outlineThickness, Color fillColor)
+	{
+		DrawRectangle(x, y, width, height, outlineColor);
+		DrawRectangle(x + outlineThickness, y + outlineThickness, width-(2*outlineThickness), height-(2*outlineThickness), fillColor);
 	}
 }
