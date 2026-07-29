@@ -17,7 +17,8 @@ class Renderer : Singleton<Renderer>
 	static readonly Color logoColor = Color.White;
 	static readonly Color keyColor = Color.White;
 	static readonly Color keyPressedColor = Color.Gray;
-	static readonly Color noteLineColor = Color.White;
+	static readonly Color activeOctaveColor = Color.White;
+	static readonly Color inactiveOctaveColor = Color.Gray;
 
 	const int defaultMargin = 12;
 
@@ -61,17 +62,19 @@ class Renderer : Singleton<Renderer>
 
 	void DrawNoteScaleWindow()
 	{
-		DrawLine(noteLineWindowWidth/2, noteLineMargin, noteLineWindowWidth/2, screenHeight - noteLineMargin, noteLineColor);
-
 		const int octaveSeparator1Y = noteLineMargin;
 		const int octaveSeparator2Y = noteLineMargin + noteLineLength/3;
 		const int octaveSeparator3Y = noteLineMargin + 2*noteLineLength/3;
 		const int octaveSeparator4Y = noteLineMargin + noteLineLength;
 
-		DrawLine(octaveSeparatorMargin, octaveSeparator1Y, noteLineWindowWidth - octaveSeparatorMargin, octaveSeparator1Y, noteLineColor);
-		DrawLine(octaveSeparatorMargin, octaveSeparator2Y, noteLineWindowWidth - octaveSeparatorMargin, octaveSeparator2Y, noteLineColor);
-		DrawLine(octaveSeparatorMargin, octaveSeparator3Y, noteLineWindowWidth - octaveSeparatorMargin, octaveSeparator3Y, noteLineColor);
-		DrawLine(octaveSeparatorMargin, octaveSeparator4Y, noteLineWindowWidth - octaveSeparatorMargin, octaveSeparator4Y, noteLineColor);
+		DrawLine(noteLineWindowWidth/2, octaveSeparator1Y, noteLineWindowWidth/2, octaveSeparator2Y, Instrument.OctaveShift ==  1? activeOctaveColor : inactiveOctaveColor);
+		DrawLine(noteLineWindowWidth/2, octaveSeparator2Y, noteLineWindowWidth/2, octaveSeparator3Y, Instrument.OctaveShift ==  0? activeOctaveColor : inactiveOctaveColor);
+		DrawLine(noteLineWindowWidth/2, octaveSeparator3Y, noteLineWindowWidth/2, octaveSeparator4Y, Instrument.OctaveShift == -1? activeOctaveColor : inactiveOctaveColor);
+
+		DrawLine(octaveSeparatorMargin, octaveSeparator1Y, noteLineWindowWidth - octaveSeparatorMargin, octaveSeparator1Y, Instrument.OctaveShift ==  1? activeOctaveColor : inactiveOctaveColor);
+		DrawLine(octaveSeparatorMargin, octaveSeparator2Y, noteLineWindowWidth - octaveSeparatorMargin, octaveSeparator2Y, Instrument.OctaveShift != -1? activeOctaveColor : inactiveOctaveColor);
+		DrawLine(octaveSeparatorMargin, octaveSeparator3Y, noteLineWindowWidth - octaveSeparatorMargin, octaveSeparator3Y, Instrument.OctaveShift !=  1? activeOctaveColor : inactiveOctaveColor);
+		DrawLine(octaveSeparatorMargin, octaveSeparator4Y, noteLineWindowWidth - octaveSeparatorMargin, octaveSeparator4Y, Instrument.OctaveShift == -1? activeOctaveColor : inactiveOctaveColor);
 	}
 
 	void DrawMainWindow()

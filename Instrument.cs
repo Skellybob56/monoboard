@@ -13,7 +13,7 @@ class Instrument : Singleton<Instrument>
 	readonly MidiManager midiManager;
 
 	int baseOctave = 4;
-	int octaveShift = 0;
+	public static int OctaveShift { get; private set; } = 0;
 	int noteShift = 0;
 
 	Keymap keymap;
@@ -81,14 +81,14 @@ class Instrument : Singleton<Instrument>
 
 		{
 			int newOctaveShift = (keymap.HasFlag(Keymap.Up)? 1 : 0) + (keymap.HasFlag(Keymap.Down)? -1 : 0);
-			if (octaveShift != newOctaveShift) { Program.ScheduleGraphicalUpdate(); }
-			octaveShift = newOctaveShift;
+			if (OctaveShift != newOctaveShift) { Program.ScheduleGraphicalUpdate(); }
+			OctaveShift = newOctaveShift;
 		}
 
 		// update base octave
 		if (differenceKeymap.HasFlag(Keymap.ApplyOctave) && keymap.HasFlag(Keymap.ApplyOctave))
 		{
-			baseOctave += octaveShift;
+			baseOctave += OctaveShift;
 		}
 
 		UpdateNote(time);
@@ -109,7 +109,7 @@ class Instrument : Singleton<Instrument>
 				else
 				{
 					int note = notes[noteIndex] + noteShift;
-					int octave = baseOctave + octaveShift;
+					int octave = baseOctave + OctaveShift;
 					midiManager.NoteEvent((octave, note));
 				}
 				changeCheckTime = null;
