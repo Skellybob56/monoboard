@@ -17,10 +17,13 @@ class Renderer : Singleton<Renderer>
 	static readonly Color logoColor = Color.White;
 	static readonly Color keyColor = Color.White;
 	static readonly Color keyPressedColor = Color.Gray;
+	static readonly Color noteLineColor = Color.White;
 
 	const int defaultMargin = 12;
 
-	const int noteScaleWindowWidth = 64;
+	const int noteLineWindowWidth = 64;
+	const int noteLineMargin = 32;
+	const int octaveSeparatorMargin = 12;
 
 	const int logoHeight = Program.fontSize;
 
@@ -30,10 +33,12 @@ class Renderer : Singleton<Renderer>
 	const int keyPressedSink = 6;
 
 	// maths
-	const int logoTextX = defaultMargin + noteScaleWindowWidth;
+	const int noteLineLength = screenHeight - 2*noteLineMargin;
+
+	const int logoTextX = defaultMargin + noteLineWindowWidth;
 	const int logoTextY = defaultMargin;
 
-	const int keySetX = defaultMargin + noteScaleWindowWidth;
+	const int keySetX = defaultMargin + noteLineWindowWidth;
 	const int keySetY = logoTextY + logoHeight + defaultMargin;
 	const int keyBoxJump = keyBoxSpacing + keyBoxWidth;
 
@@ -45,12 +50,35 @@ class Renderer : Singleton<Renderer>
 
 	public void Render()
 	{
-		DrawLine(noteScaleWindowWidth, 0, noteScaleWindowWidth, screenHeight, dividerColor);
-
 		ClearBackground(backgroundColor);
+
+		DrawNoteScaleWindow();
+
+		DrawLine(noteLineWindowWidth, 0, noteLineWindowWidth, screenHeight, dividerColor);
+
+		DrawMainWindow();
+	}
+
+	void DrawNoteScaleWindow()
+	{
+		DrawLine(noteLineWindowWidth/2, noteLineMargin, noteLineWindowWidth/2, screenHeight - noteLineMargin, noteLineColor);
+
+		const int octaveSeparator1Y = noteLineMargin;
+		const int octaveSeparator2Y = noteLineMargin + noteLineLength/3;
+		const int octaveSeparator3Y = noteLineMargin + 2*noteLineLength/3;
+		const int octaveSeparator4Y = noteLineMargin + noteLineLength;
+
+		DrawLine(octaveSeparatorMargin, octaveSeparator1Y, noteLineWindowWidth - octaveSeparatorMargin, octaveSeparator1Y, noteLineColor);
+		DrawLine(octaveSeparatorMargin, octaveSeparator2Y, noteLineWindowWidth - octaveSeparatorMargin, octaveSeparator2Y, noteLineColor);
+		DrawLine(octaveSeparatorMargin, octaveSeparator3Y, noteLineWindowWidth - octaveSeparatorMargin, octaveSeparator3Y, noteLineColor);
+		DrawLine(octaveSeparatorMargin, octaveSeparator4Y, noteLineWindowWidth - octaveSeparatorMargin, octaveSeparator4Y, noteLineColor);
+	}
+
+	void DrawMainWindow()
+	{
 		DrawTextEx(Program.font, "MONOBOARD", new(logoTextX, logoTextY), Program.fontSize, 30, logoColor);
 
-		DrawLine(noteScaleWindowWidth, logoTextY + logoHeight, noteScaleWindowWidth + defaultMargin + spacebarWidth + defaultMargin, logoTextY + logoHeight, dividerColor);
+		DrawLine(noteLineWindowWidth, logoTextY + logoHeight, noteLineWindowWidth + defaultMargin + spacebarWidth + defaultMargin, logoTextY + logoHeight, dividerColor);
 
 		DrawKey(keySetX + 0*keyBoxJump, keySetY, Glyph.A, Controller.CurrentKeymap.HasFlag(KeymapUtil.Keymap.A));
 		DrawKey(keySetX + 1*keyBoxJump, keySetY, Glyph.S, Controller.CurrentKeymap.HasFlag(KeymapUtil.Keymap.S));
@@ -72,7 +100,7 @@ class Renderer : Singleton<Renderer>
 		DrawGlyph(x, y + yOffset, glyph, pressed? keyPressedColor : keyColor);
 	}
 
-	static void DrawGlyph(int x, int y, Glyph glyph, Color color)
+	void DrawGlyph(int x, int y, Glyph glyph, Color color)
 	{
 		char character = GlyphToChar(glyph);
 

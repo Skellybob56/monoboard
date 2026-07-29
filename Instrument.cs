@@ -78,7 +78,12 @@ class Instrument : Singleton<Instrument>
 
 		// update shifts
 		noteShift = keymap.HasFlag(Keymap.Sharp)? 1 : 0;
-		octaveShift = (keymap.HasFlag(Keymap.Up)? 1 : 0) + (keymap.HasFlag(Keymap.Down)? -1 : 0);
+
+		{
+			int newOctaveShift = (keymap.HasFlag(Keymap.Up)? 1 : 0) + (keymap.HasFlag(Keymap.Down)? -1 : 0);
+			if (octaveShift != newOctaveShift) { Program.ScheduleGraphicalUpdate(); }
+			octaveShift = newOctaveShift;
+		}
 
 		// update base octave
 		if (differenceKeymap.HasFlag(Keymap.ApplyOctave) && keymap.HasFlag(Keymap.ApplyOctave))

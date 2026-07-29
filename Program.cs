@@ -27,7 +27,10 @@ internal static class Program
 		InitWindow(Renderer.screenWidth, Renderer.screenHeight, "Monoboard");
 		SetExitKey(KeyboardKey.Null);
 
-		font = LoadFontEx("assets/LibreBaskerville-VariableFont_wght.ttf", fontSize, ['M', 'O', 'N', 'B', 'A', 'R', 'D', 'S', 'F', 'J', 'K', 'L', ';'], 13);
+		font = LoadFontEx("assets/LibreBaskerville-VariableFont_wght.ttf", fontSize,
+			['M', 'O', 'N', 'B', 'A', 'R', 'D', // MONOBOARD
+			 'S', 'F', 'J', 'K', 'L', ';', // ASDF JKL;
+			 'C', 'E', 'G', '#', 'b'], 13); // A B C D E F G # b
 
 		controller = Controller.Create();
 		midiManager = MidiManager.Create();

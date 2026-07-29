@@ -21,6 +21,8 @@ class MidiManager : Singleton<MidiManager>
 
 	public void NoteEvent((int octave, int note)? noteData)
 	{
+		Program.ScheduleGraphicalUpdate(); // to update currently playing note display
+
 		if (noteData is null)
 		{ NoteOffEvent(); return; } // null noteData: treat as a rest
 
