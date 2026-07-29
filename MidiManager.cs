@@ -12,7 +12,7 @@ class MidiManager : Singleton<MidiManager>
 	const byte noteVelocity = 80; // limited to a 7 bit integer (80 is considered mf in musical volume)
 	const bool startNoteBeforeEndNote = true; // when swapping between two notes, this will start the next note before ending the last which can prevent monophonic clicking
 
-	byte? playingNote = null;
+	public static byte? PlayingNote { get; private set; } = null;
 
 	private MidiManager()
 	{
@@ -37,26 +37,26 @@ class MidiManager : Singleton<MidiManager>
 	{
 		Debug.Assert(newNote < 0x7F);
 
-		if (playingNote == newNote) { return; } // note is already playing
+		if (PlayingNote == newNote) { return; } // note is already playing
 
-		if (!startNoteBeforeEndNote && playingNote is not null)
-		{ TEVirtualMidi.virtualMIDISendData(MidiPortHandler.LpvmMidiPort, [0x80, playingNote.Value, 0x00], 3); }
+		if (!startNoteBeforeEndNote && PlayingNote is not null)
+		{ TEVirtualMidi.virtualMIDISendData(MidiPortHandler.LpvmMidiPort, [0x80, PlayingNote.Value, 0x00], 3); }
 
 		TEVirtualMidi.virtualMIDISendData(MidiPortHandler.LpvmMidiPort, [0x90, newNote, noteVelocity], 3);
 
-		if (startNoteBeforeEndNote && playingNote is not null)
-		{ TEVirtualMidi.virtualMIDISendData(MidiPortHandler.LpvmMidiPort, [0x80, playingNote.Value, 0x00], 3); }
+		if (startNoteBeforeEndNote && PlayingNote is not null)
+		{ TEVirtualMidi.virtualMIDISendData(MidiPortHandler.LpvmMidiPort, [0x80, PlayingNote.Value, 0x00], 3); }
 
-		playingNote = newNote;
+		PlayingNote = newNote;
 	}
 
 	void NoteOffEvent()
 	{
-		if (playingNote is null)
+		if (PlayingNote is null)
 		{ return; } // attempted to stop playing a note while no note was playing
 
-		TEVirtualMidi.virtualMIDISendData(MidiPortHandler.LpvmMidiPort, [0x80, playingNote.Value, 0x00], 3);
-		playingNote = null;
+		TEVirtualMidi.virtualMIDISendData(MidiPortHandler.LpvmMidiPort, [0x80, PlayingNote.Value, 0x00], 3);
+		PlayingNote = null;
 	}
 
 	protected override void Dispose()

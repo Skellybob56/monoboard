@@ -89,6 +89,9 @@ class Instrument : Singleton<Instrument>
 		if (differenceKeymap.HasFlag(Keymap.ApplyOctave) && keymap.HasFlag(Keymap.ApplyOctave))
 		{
 			baseOctave += OctaveShift;
+
+			// baseOctave changing requires that the current note marker is shifted by an octave
+			if (OctaveShift != 0) { Program.ScheduleGraphicalUpdate(); }
 		}
 
 		UpdateNote(time);

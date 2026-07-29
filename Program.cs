@@ -30,7 +30,7 @@ internal static class Program
 		font = LoadFontEx("assets/LibreBaskerville-VariableFont_wght.ttf", fontSize,
 			['M', 'O', 'N', 'B', 'A', 'R', 'D', // MONOBOARD
 			 'S', 'F', 'J', 'K', 'L', ';', // ASDF JKL;
-			 'C', 'E', 'G', '#', 'b'], 13); // A B C D E F G # b
+			 'C', 'E', 'G', '#', 'b'], 18); // A B C D E F G # b
 
 		controller = Controller.Create();
 		midiManager = MidiManager.Create();

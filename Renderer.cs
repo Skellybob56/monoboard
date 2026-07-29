@@ -24,7 +24,6 @@ class Renderer : Singleton<Renderer>
 
 	const int noteLineWindowWidth = 64;
 	const int noteLineMargin = 32;
-	const int octaveSeparatorMargin = 12;
 
 	const int logoHeight = Program.fontSize;
 
@@ -67,14 +66,25 @@ class Renderer : Singleton<Renderer>
 		const int octaveSeparator3Y = noteLineMargin + 2*noteLineLength/3;
 		const int octaveSeparator4Y = noteLineMargin + noteLineLength;
 
+		// vertical line
 		DrawLine(noteLineWindowWidth/2, octaveSeparator1Y, noteLineWindowWidth/2, octaveSeparator2Y, Instrument.OctaveShift ==  1? activeOctaveColor : inactiveOctaveColor);
 		DrawLine(noteLineWindowWidth/2, octaveSeparator2Y, noteLineWindowWidth/2, octaveSeparator3Y, Instrument.OctaveShift ==  0? activeOctaveColor : inactiveOctaveColor);
 		DrawLine(noteLineWindowWidth/2, octaveSeparator3Y, noteLineWindowWidth/2, octaveSeparator4Y, Instrument.OctaveShift == -1? activeOctaveColor : inactiveOctaveColor);
 
-		DrawLine(octaveSeparatorMargin, octaveSeparator1Y, noteLineWindowWidth - octaveSeparatorMargin, octaveSeparator1Y, Instrument.OctaveShift ==  1? activeOctaveColor : inactiveOctaveColor);
-		DrawLine(octaveSeparatorMargin, octaveSeparator2Y, noteLineWindowWidth - octaveSeparatorMargin, octaveSeparator2Y, Instrument.OctaveShift != -1? activeOctaveColor : inactiveOctaveColor);
-		DrawLine(octaveSeparatorMargin, octaveSeparator3Y, noteLineWindowWidth - octaveSeparatorMargin, octaveSeparator3Y, Instrument.OctaveShift !=  1? activeOctaveColor : inactiveOctaveColor);
-		DrawLine(octaveSeparatorMargin, octaveSeparator4Y, noteLineWindowWidth - octaveSeparatorMargin, octaveSeparator4Y, Instrument.OctaveShift == -1? activeOctaveColor : inactiveOctaveColor);
+		// octave separators
+		DrawLine(defaultMargin, octaveSeparator1Y, noteLineWindowWidth - defaultMargin, octaveSeparator1Y, Instrument.OctaveShift ==  1? activeOctaveColor : inactiveOctaveColor);
+		DrawLine(defaultMargin, octaveSeparator2Y, noteLineWindowWidth - defaultMargin, octaveSeparator2Y, Instrument.OctaveShift != -1? activeOctaveColor : inactiveOctaveColor);
+		DrawLine(defaultMargin, octaveSeparator3Y, noteLineWindowWidth - defaultMargin, octaveSeparator3Y, Instrument.OctaveShift !=  1? activeOctaveColor : inactiveOctaveColor);
+		DrawLine(defaultMargin, octaveSeparator4Y, noteLineWindowWidth - defaultMargin, octaveSeparator4Y, Instrument.OctaveShift == -1? activeOctaveColor : inactiveOctaveColor);
+
+		if (MidiManager.PlayingNote is not null)
+		{
+			// 3n/4 - o/2
+			int playingNoteY = (octaveSeparator2Y + octaveSeparator3Y)/2; // todo: replace temp playing note position with a calcualted position
+			DrawLine(noteLineWindowWidth/2, playingNoteY, 3*noteLineWindowWidth/4 - defaultMargin/2, playingNoteY, Color.Red);
+			// todo: add new small font, improve the position of the text and generate the note text from the playing note
+			DrawTextEx(Program.font, "C#", new(3*noteLineWindowWidth/4 - defaultMargin/2, playingNoteY), Program.fontSize/4, 0, Color.Red);
+		}
 	}
 
 	void DrawMainWindow()
