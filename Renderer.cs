@@ -33,7 +33,6 @@ class Renderer : Singleton<Renderer>
 	const int keyPressedSink = 6;
 
 	// maths
-	const int noteLineLength = screenHeight - 2*noteLineMargin;
 
 	const int logoTextX = defaultMargin + noteLineWindowWidth;
 	const int logoTextY = defaultMargin;
@@ -61,10 +60,12 @@ class Renderer : Singleton<Renderer>
 
 	void DrawNoteScaleWindow()
 	{
-		const int octaveSeparator1Y = noteLineMargin;
-		const int octaveSeparator2Y = noteLineMargin + noteLineLength/3;
-		const int octaveSeparator3Y = noteLineMargin + 2*noteLineLength/3;
-		const int octaveSeparator4Y = noteLineMargin + noteLineLength;
+		const int noteLineLength = screenHeight - 2*noteLineMargin;
+		const int octaveHeight = noteLineLength/3;
+		const int octaveSeparator1Y = noteLineMargin + 0*octaveHeight;
+		const int octaveSeparator2Y = noteLineMargin + 1*octaveHeight;
+		const int octaveSeparator3Y = noteLineMargin + 2*octaveHeight;
+		const int octaveSeparator4Y = noteLineMargin + 3*octaveHeight;
 
 		// vertical line
 		DrawLine(defaultMargin, octaveSeparator1Y, defaultMargin, octaveSeparator2Y, Instrument.OctaveShift ==  1? activeOctaveColor : inactiveOctaveColor);
@@ -104,8 +105,11 @@ class Renderer : Singleton<Renderer>
 					new(defaultMargin + playingNoteArrowWidth + playingNoteBoxWidth - playingNoteOutlineThickness, playingNoteY - Program.smallFontSize/2 + playingNoteOutlineThickness),
 				],
 				5, backgroundColor);
-			// todo: improve the position of the text and generate the note text from the playing note
-			DrawTextEx(Program.smallFont, "C#", new(defaultMargin + playingNoteArrowWidth, playingNoteY - Program.smallFontSize/2 + noteTextOffsetY), Program.smallFontSize, 0, Color.Red);
+			// todo: improve the position of the text
+			const string noteDisplay = "C C#D D#E F F#G G#A A#B "; // todo: this system needs to be expanded to use flats and maybe even double sharps and flats to best notate the scale. it will also need to be unified with the scale 
+			DrawTextEx(Program.smallFont, noteDisplay.Substring(MidiManager.PlayingNote.Value%12 * 2, 2),
+				new(defaultMargin + playingNoteArrowWidth, playingNoteY - Program.smallFontSize/2 + noteTextOffsetY),
+				Program.smallFontSize, 0, Color.Red);
 		}
 	}
 
