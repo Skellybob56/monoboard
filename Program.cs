@@ -19,6 +19,8 @@ internal static class Program
 
 	public static readonly Font font;
 	public const int fontSize = 48;
+	public static readonly Font smallFont;
+	public const int smallFontSize = 18;
 
 	static bool updateGraphics = false;
 
@@ -31,6 +33,9 @@ internal static class Program
 			['M', 'O', 'N', 'B', 'A', 'R', 'D', // MONOBOARD
 			 'S', 'F', 'J', 'K', 'L', ';', // ASDF JKL;
 			 'C', 'E', 'G', '#', 'b'], 18); // A B C D E F G # b
+
+		smallFont = LoadFontEx("assets/AtkinsonHyperlegibleNext-Regular.otf", smallFontSize,
+			['A', 'B', 'C', 'D', 'E', 'F', 'G', '#', 'b'], 9);
 
 		controller = Controller.Create();
 		midiManager = MidiManager.Create();

@@ -67,9 +67,9 @@ class Renderer : Singleton<Renderer>
 		const int octaveSeparator4Y = noteLineMargin + noteLineLength;
 
 		// vertical line
-		DrawLine(noteLineWindowWidth/2, octaveSeparator1Y, noteLineWindowWidth/2, octaveSeparator2Y, Instrument.OctaveShift ==  1? activeOctaveColor : inactiveOctaveColor);
-		DrawLine(noteLineWindowWidth/2, octaveSeparator2Y, noteLineWindowWidth/2, octaveSeparator3Y, Instrument.OctaveShift ==  0? activeOctaveColor : inactiveOctaveColor);
-		DrawLine(noteLineWindowWidth/2, octaveSeparator3Y, noteLineWindowWidth/2, octaveSeparator4Y, Instrument.OctaveShift == -1? activeOctaveColor : inactiveOctaveColor);
+		DrawLine(defaultMargin, octaveSeparator1Y, defaultMargin, octaveSeparator2Y, Instrument.OctaveShift ==  1? activeOctaveColor : inactiveOctaveColor);
+		DrawLine(defaultMargin, octaveSeparator2Y, defaultMargin, octaveSeparator3Y, Instrument.OctaveShift ==  0? activeOctaveColor : inactiveOctaveColor);
+		DrawLine(defaultMargin, octaveSeparator3Y, defaultMargin, octaveSeparator4Y, Instrument.OctaveShift == -1? activeOctaveColor : inactiveOctaveColor);
 
 		// octave separators
 		DrawLine(defaultMargin, octaveSeparator1Y, noteLineWindowWidth - defaultMargin, octaveSeparator1Y, Instrument.OctaveShift ==  1? activeOctaveColor : inactiveOctaveColor);
@@ -79,11 +79,33 @@ class Renderer : Singleton<Renderer>
 
 		if (MidiManager.PlayingNote is not null)
 		{
-			// 3n/4 - o/2
+			const int playingNoteArrowWidth = 16;
+			const int playingNoteBoxWidth = 3*Program.smallFontSize/2;
+			const int playingNoteOutlineThickness = 1;
+			const int noteTextOffsetY = 1;
 			int playingNoteY = (octaveSeparator2Y + octaveSeparator3Y)/2; // todo: replace temp playing note position with a calcualted position
-			DrawLine(noteLineWindowWidth/2, playingNoteY, 3*noteLineWindowWidth/4 - defaultMargin/2, playingNoteY, Color.Red);
-			// todo: add new small font, improve the position of the text and generate the note text from the playing note
-			DrawTextEx(Program.font, "C#", new(3*noteLineWindowWidth/4 - defaultMargin/2, playingNoteY), Program.fontSize/4, 0, Color.Red);
+
+			// todo: replace aliased solution with AA shader
+			DrawTriangleFan(
+				[
+					new(defaultMargin + playingNoteArrowWidth, playingNoteY - Program.smallFontSize/2),
+					new(defaultMargin, playingNoteY),
+					new(defaultMargin + playingNoteArrowWidth, playingNoteY + Program.smallFontSize/2),
+					new(defaultMargin + playingNoteArrowWidth + playingNoteBoxWidth, playingNoteY + Program.smallFontSize/2),
+					new(defaultMargin + playingNoteArrowWidth + playingNoteBoxWidth, playingNoteY - Program.smallFontSize/2),
+				],
+				5, Color.Red);
+			DrawTriangleFan(
+				[
+					new(defaultMargin + playingNoteArrowWidth, playingNoteY - Program.smallFontSize/2 + playingNoteOutlineThickness),
+					new(defaultMargin + playingNoteOutlineThickness+0.625f, playingNoteY), // +0.625 is a fudge to reduce aliasing
+					new(defaultMargin + playingNoteArrowWidth, playingNoteY + Program.smallFontSize/2 - playingNoteOutlineThickness),
+					new(defaultMargin + playingNoteArrowWidth + playingNoteBoxWidth - playingNoteOutlineThickness, playingNoteY + Program.smallFontSize/2 - playingNoteOutlineThickness),
+					new(defaultMargin + playingNoteArrowWidth + playingNoteBoxWidth - playingNoteOutlineThickness, playingNoteY - Program.smallFontSize/2 + playingNoteOutlineThickness),
+				],
+				5, backgroundColor);
+			// todo: improve the position of the text and generate the note text from the playing note
+			DrawTextEx(Program.smallFont, "C#", new(defaultMargin + playingNoteArrowWidth, playingNoteY - Program.smallFontSize/2 + noteTextOffsetY), Program.smallFontSize, 0, Color.Red);
 		}
 	}
 
