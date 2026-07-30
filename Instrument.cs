@@ -12,6 +12,8 @@ class Instrument : Singleton<Instrument>
 
 	readonly MidiManager midiManager;
 
+	public static byte RootTone { get; private set; }
+
 	int baseOctave = 4;
 	public static int OctaveShift { get; private set; } = 0;
 	int noteShift = 0;
@@ -26,14 +28,15 @@ class Instrument : Singleton<Instrument>
 	private Instrument(MidiManager midiManager)
 	{
 		this.midiManager = midiManager;
-		(combinations, notes) = InitCombinationsAndScale(8, "Default", "Major", 2);
+		RootTone = 2;
+		(combinations, notes) = InitCombinationsAndScale(8, "Default", "Major");
 	}
 
-	static (Keymap[] combinations, sbyte[] notes) InitCombinationsAndScale(int scaleSize, string combinationsFilename, string notesFilename, int rootNote)
+	static (Keymap[] combinations, sbyte[] notes) InitCombinationsAndScale(int scaleSize, string combinationsFilename, string notesFilename)
 	{
 		string sizePrefix = scaleSize.ToString() + " - ";
 		Keymap[] combinations = FileReader.GetCombinations(sizePrefix + combinationsFilename);
-		sbyte[] notes = FileReader.GetNotes(sizePrefix + notesFilename, rootNote, combinations.Length);
+		sbyte[] notes = FileReader.GetNotes(sizePrefix + notesFilename, RootTone, combinations.Length);
 
 		DebugOutputNoteGuide(combinations, notes);
 

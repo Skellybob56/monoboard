@@ -80,11 +80,15 @@ class Renderer : Singleton<Renderer>
 
 		if (MidiManager.PlayingNote is not null)
 		{
+			byte playingNote = MidiManager.PlayingNote.Value;
+
 			const int playingNoteArrowWidth = 16;
 			const int playingNoteBoxWidth = 3*Program.smallFontSize/2;
 			const int playingNoteOutlineThickness = 1;
 			const int noteTextOffsetY = 1;
-			int playingNoteY = (octaveSeparator2Y + octaveSeparator3Y)/2; // todo: replace temp playing note position with a calcualted position
+
+			int baseOctave = 4; // todo: get this from Instrument
+			int playingNoteY = octaveSeparator4Y - (int)MathF.Round((playingNote - (baseOctave-1)*12 - Instrument.RootTone) * octaveHeight/12f);
 
 			// todo: replace aliased solution with AA shader
 			DrawTriangleFan(
@@ -105,9 +109,9 @@ class Renderer : Singleton<Renderer>
 					new(defaultMargin + playingNoteArrowWidth + playingNoteBoxWidth - playingNoteOutlineThickness, playingNoteY - Program.smallFontSize/2 + playingNoteOutlineThickness),
 				],
 				5, backgroundColor);
-			// todo: improve the position of the text
+
 			const string noteDisplay = "C C#D D#E F F#G G#A A#B "; // todo: this system needs to be expanded to use flats and maybe even double sharps and flats to best notate the scale. it will also need to be unified with the scale 
-			DrawTextEx(Program.smallFont, noteDisplay.Substring(MidiManager.PlayingNote.Value%12 * 2, 2),
+			DrawTextEx(Program.smallFont, noteDisplay.Substring(playingNote%12 * 2, 2),
 				new(defaultMargin + playingNoteArrowWidth, playingNoteY - Program.smallFontSize/2 + noteTextOffsetY),
 				Program.smallFontSize, 0, Color.Red);
 		}
