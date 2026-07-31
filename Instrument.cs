@@ -14,7 +14,7 @@ class Instrument : Singleton<Instrument>
 
 	public static byte RootTone { get; private set; }
 
-	int baseOctave = 4;
+	public static int BaseOctave { get; private set; } = 4;
 	public static int OctaveShift { get; private set; } = 0;
 	int noteShift = 0;
 
@@ -91,9 +91,9 @@ class Instrument : Singleton<Instrument>
 		// update base octave
 		if (differenceKeymap.HasFlag(Keymap.ApplyOctave) && keymap.HasFlag(Keymap.ApplyOctave))
 		{
-			baseOctave += OctaveShift;
+			BaseOctave += OctaveShift;
 
-			// baseOctave changing requires that the current note marker is shifted by an octave
+			// BaseOctave changing requires that the current note marker is shifted by an octave
 			if (OctaveShift != 0) { Program.ScheduleGraphicalUpdate(); }
 		}
 
@@ -115,7 +115,7 @@ class Instrument : Singleton<Instrument>
 				else
 				{
 					int note = notes[noteIndex] + noteShift;
-					int octave = baseOctave + OctaveShift;
+					int octave = BaseOctave + OctaveShift;
 					midiManager.NoteEvent((octave, note));
 				}
 				changeCheckTime = null;
