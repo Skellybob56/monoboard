@@ -10,6 +10,9 @@ class Instrument : Singleton<Instrument>
 	// todo: add a smaller `checkTimeOffset` variant that only applies if there are no note keys pressed in the early window (in other words, check for no note keys pressed before the check time and start the rest early if detected)
 	const double checkTimeOffset = 1d / 32d; // in seconds
 
+	const int maxBaseOctave = 99;
+	const int minBaseOctave = -9;
+
 	readonly MidiManager midiManager;
 
 	public static byte RootTone { get; private set; }
@@ -89,12 +92,11 @@ class Instrument : Singleton<Instrument>
 		}
 
 		// update base octave
-		if (differenceKeymap.HasFlag(Keymap.ApplyOctave) && keymap.HasFlag(Keymap.ApplyOctave))
+		if (differenceKeymap.HasFlag(Keymap.ApplyOctave) && keymap.HasFlag(Keymap.ApplyOctave) && OctaveShift != 0)
 		{
 			BaseOctave += OctaveShift;
-
-			// BaseOctave changing requires that the current note marker is shifted by an octave
-			if (OctaveShift != 0) { Program.ScheduleGraphicalUpdate(); }
+			BaseOctave = Math.Clamp(BaseOctave, minBaseOctave, maxBaseOctave);
+			Program.ScheduleGraphicalUpdate();
 		}
 
 		UpdateNote(time);
