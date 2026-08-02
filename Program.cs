@@ -35,7 +35,8 @@ internal static class Program
 			 'C', 'E', 'G', '#', 'b'], 18); // A B C D E F G # b
 
 		smallFont = LoadFontEx("assets/AtkinsonHyperlegibleNext-Regular.otf", smallFontSize,
-			['A', 'B', 'C', 'D', 'E', 'F', 'G', '#', 'b'], 9);
+			['A', 'B', 'C', 'D', 'E', 'F', 'G', '#', 'b',
+			 '-', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'], 20);
 
 		controller = Controller.Create();
 		midiManager = MidiManager.Create();

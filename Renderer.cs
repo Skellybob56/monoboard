@@ -24,7 +24,8 @@ class Renderer : Singleton<Renderer>
 	const int defaultMargin = 12;
 
 	const int noteLineWindowWidth = 64;
-	const int noteLineMargin = 32;
+	const int baseOctaveHeight = Program.smallFontSize;
+	const int noteLineMargin = 16;
 
 	const int logoHeight = Program.fontSize;
 
@@ -71,12 +72,18 @@ class Renderer : Singleton<Renderer>
 
 	void DrawNoteScaleWindow()
 	{
-		const int noteLineLength = screenHeight - 2*noteLineMargin;
+		const int baseOctaveY = defaultMargin;
+		const int noteLineY = baseOctaveY + baseOctaveHeight + noteLineMargin;
+		const int noteLineLength = screenHeight - noteLineY - noteLineMargin;
 		const int octaveHeight = noteLineLength/3;
-		const int octaveSeparator1Y = noteLineMargin + 0*octaveHeight;
-		const int octaveSeparator2Y = noteLineMargin + 1*octaveHeight;
-		const int octaveSeparator3Y = noteLineMargin + 2*octaveHeight;
-		const int octaveSeparator4Y = noteLineMargin + 3*octaveHeight;
+		const int octaveSeparator1Y = noteLineY + 0*octaveHeight;
+		const int octaveSeparator2Y = noteLineY + 1*octaveHeight;
+		const int octaveSeparator3Y = noteLineY + 2*octaveHeight;
+		const int octaveSeparator4Y = noteLineY + 3*octaveHeight;
+
+		string baseOctaveString = Instrument.BaseOctave.ToString();
+		int baseOctaveX = (int)MathF.Round(noteLineWindowWidth/2f - MeasureTextEx(Program.smallFont, baseOctaveString, Program.smallFontSize, 0).X/2f);
+		DrawTextEx(Program.smallFont, baseOctaveString, new(baseOctaveX, baseOctaveY), Program.smallFontSize, 0, Color.Red);
 
 		// vertical line
 		DrawLine(defaultMargin, octaveSeparator1Y, defaultMargin, octaveSeparator2Y, Instrument.OctaveShift ==  1? activeOctaveColor : inactiveOctaveColor);
