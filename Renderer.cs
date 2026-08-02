@@ -19,6 +19,7 @@ class Renderer : Singleton<Renderer>
 	static readonly Color keyPressedColor = Color.Gray;
 	static readonly Color activeOctaveColor = Color.White;
 	static readonly Color inactiveOctaveColor = Color.Gray;
+	static readonly Color playingNoteColor = Color.Red;
 
 	const int defaultMargin = 12;
 
@@ -108,7 +109,7 @@ class Renderer : Singleton<Renderer>
 					new(defaultMargin + playingNoteArrowWidth + playingNoteBoxWidth, playingNoteY + Program.smallFontSize/2),
 					new(defaultMargin + playingNoteArrowWidth + playingNoteBoxWidth, playingNoteY - Program.smallFontSize/2),
 				],
-				5, Color.Red);
+				5, playingNoteColor);
 			DrawTriangleFan(
 				[
 					new(defaultMargin + playingNoteArrowWidth, playingNoteY - Program.smallFontSize/2 + playingNoteOutlineThickness),
@@ -122,7 +123,7 @@ class Renderer : Singleton<Renderer>
 			const string noteDisplay = "C C#D D#E F F#G G#A A#B "; // todo: this system needs to be expanded to use flats and maybe even double sharps and flats to best notate the scale. it will also need to be unified with the scale 
 			DrawTextEx(Program.smallFont, noteDisplay.Substring(playingNote%12 * 2, 2),
 				new(defaultMargin + playingNoteArrowWidth, playingNoteY - Program.smallFontSize/2 + noteTextOffsetY),
-				Program.smallFontSize, 0, Color.Red);
+				Program.smallFontSize, 0, playingNoteColor);
 		}
 	}
 
