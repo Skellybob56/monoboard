@@ -23,35 +23,35 @@ class Instrument : Singleton<Instrument>
 	double? changeCheckTime;
 
 	Keymap[] combinations;
-	sbyte[] notes;
+	sbyte[] scale;
 
 	private Instrument(MidiManager midiManager)
 	{
 		this.midiManager = midiManager;
 		RootTone = 2;
-		(combinations, notes) = InitCombinationsAndScale(8, "Default", "Major");
+		(combinations, scale) = InitCombinationsAndScale(8, "Default", "Major");
 	}
 
-	static (Keymap[] combinations, sbyte[] notes) InitCombinationsAndScale(int scaleSize, string combinationsFilename, string notesFilename)
+	static (Keymap[] combinations, sbyte[] scale) InitCombinationsAndScale(int scaleSize, string combinationsFilename, string scaleFilename)
 	{
 		string sizePrefix = scaleSize.ToString() + " - ";
 		Keymap[] combinations = FileReader.GetCombinations(sizePrefix + combinationsFilename);
-		sbyte[] notes = FileReader.GetNotes(sizePrefix + notesFilename, RootTone, combinations.Length);
+		sbyte[] scale = FileReader.GetScale(sizePrefix + scaleFilename, combinations.Length);
 
-		DebugOutputNoteGuide(combinations, notes);
+		DebugOutputNoteGuide(combinations, scale);
 
-		return (combinations, notes);
+		return (combinations, scale);
 	}
 
 
-	static void DebugOutputNoteGuide(ReadOnlySpan<Keymap> combinations, ReadOnlySpan<sbyte> notes)
+	static void DebugOutputNoteGuide(ReadOnlySpan<Keymap> combinations, ReadOnlySpan<sbyte> scale)
 	{
 		for (int i = 0; i < combinations.Length; i++)
 		{
-			Console.WriteLine(DebugOutputOfSingleNote(combinations[i], notes[i]));
+			Console.WriteLine(DebugOutputOfSingleNote(combinations[i], RootTone + scale[i]));
 		}
 
-		string DebugOutputOfSingleNote(Keymap combination, sbyte note)
+		string DebugOutputOfSingleNote(Keymap combination, int note)
 		{
 			// todo: use flat or sharp depending selected scale
 			const string noteDisplay = "C C#D D#E F F#G G#A A#B ";
@@ -106,15 +106,15 @@ class Instrument : Singleton<Instrument>
 		{
 			if (changeCheckTime <= time)
 			{
-				int noteIndex = Array.IndexOf(combinations, keymap & Keymap.Notes);
-				if (noteIndex == -1) // rest
+				int scaleIndex = Array.IndexOf(combinations, keymap & Keymap.Notes);
+				if (scaleIndex == -1) // rest
 				{
 					// todo: put calls to midiManager somewhere more explicit
 					midiManager.NoteEvent(null);
 				}
 				else
 				{
-					int note = notes[noteIndex] + noteShift;
+					int note = RootTone + scale[scaleIndex] + noteShift;
 					int octave = BaseOctave + OctaveShift;
 					midiManager.NoteEvent((octave, note));
 				}

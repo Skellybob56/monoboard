@@ -6,8 +6,8 @@ static class FileReader
 {
     const string combinationsFolder = "assets/patterns/";
     const string combinationsExtention = ".kmap";
-    const string notesFolder = "assets/patterns/";
-    const string notesExtention = ".nmap";
+    const string scaleFolder = "assets/patterns/";
+    const string scaleExtention = ".nmap";
 
     public static Keymap[] GetCombinations(string filename)
     {
@@ -54,14 +54,14 @@ static class FileReader
         return combinations.ToArray();
     }
 
-    public static sbyte[] GetNotes(string filename, int rootNote, int correctLength)
+    public static sbyte[] GetScale(string filename, int correctLength)
     {
         const string numbers = "0123456789";
 
-        string path = notesFolder + filename + notesExtention;
+        string path = scaleFolder + filename + scaleExtention;
         StreamReader streamReader = new StreamReader(path);
 
-        List<sbyte> notes = [];
+        List<sbyte> scale = [];
         int? currentNote = null;
         bool negative = false;
         for (char character; !streamReader.EndOfStream; )
@@ -77,7 +77,7 @@ static class FileReader
                 }
                 else // number ended
                 {
-                    notes.Add((sbyte)((negative? -currentNote.Value : currentNote.Value) + rootNote));
+                    scale.Add((sbyte)(negative? -currentNote.Value : currentNote.Value));
                     currentNote = null;
                     negative = false;
                 }
@@ -93,14 +93,14 @@ static class FileReader
         }
         if (currentNote.HasValue) // number ended at eof
         {
-            notes.Add((sbyte)((negative ? -currentNote.Value : currentNote.Value) + rootNote));
+            scale.Add((sbyte)(negative ? -currentNote.Value : currentNote.Value));
             currentNote = null;
             negative = false;
         }
 
-        if (notes.Count != correctLength)
+        if (scale.Count != correctLength)
         { throw new Exception("The number of notes loaded is not equal to the number of combinations."); }
 
-        return notes.ToArray();
+        return scale.ToArray();
     }
 }
