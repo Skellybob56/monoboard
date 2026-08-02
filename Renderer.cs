@@ -27,18 +27,28 @@ class Renderer : Singleton<Renderer>
 
 	const int logoHeight = Program.fontSize;
 
+	const int mappingSelectorHeight = 24;
+	const int mappingSelectorMarginY = 6;
+
 	const int keyBoxWidth = 48;
-	const int keyBoxHeight = 48;
+	const int keyBoxHeight = keyBoxWidth;
 	const int keyBoxSpacing = 15;
 	const int keyPressedSink = 6;
 
 	// maths
 
-	const int logoTextX = defaultMargin + noteLineWindowWidth;
+	const int logoTextX = noteLineWindowWidth + defaultMargin;
 	const int logoTextY = defaultMargin;
 
-	const int keySetX = defaultMargin + noteLineWindowWidth;
-	const int keySetY = logoTextY + logoHeight + defaultMargin;
+	const int logoDividerY = logoTextY + logoHeight;
+
+	const int mappingSelectorX = noteLineWindowWidth + defaultMargin;
+	const int mappingSelectorY = logoDividerY + mappingSelectorMarginY;
+
+	const int mappingSelectorDividerY = mappingSelectorY + mappingSelectorHeight + mappingSelectorMarginY;
+
+	const int keySetX = noteLineWindowWidth + defaultMargin;
+	const int keySetY = mappingSelectorDividerY + defaultMargin;
 	const int keyBoxJump = keyBoxSpacing + keyBoxWidth;
 
 	const int spacebarY = keySetY + keyBoxHeight + defaultMargin;
@@ -120,7 +130,9 @@ class Renderer : Singleton<Renderer>
 	{
 		DrawTextEx(Program.font, "MONOBOARD", new(logoTextX, logoTextY), Program.fontSize, 30, logoColor);
 
-		DrawLine(noteLineWindowWidth, logoTextY + logoHeight, noteLineWindowWidth + defaultMargin + spacebarWidth + defaultMargin, logoTextY + logoHeight, dividerColor);
+		DrawLine(noteLineWindowWidth, logoDividerY, screenWidth, logoDividerY, dividerColor);
+
+		DrawLine(noteLineWindowWidth, mappingSelectorDividerY, screenWidth, mappingSelectorDividerY, dividerColor);
 
 		DrawKey(keySetX + 0*keyBoxJump, keySetY, Glyph.A, Controller.CurrentKeymap.HasFlag(KeymapUtil.Keymap.A));
 		DrawKey(keySetX + 1*keyBoxJump, keySetY, Glyph.S, Controller.CurrentKeymap.HasFlag(KeymapUtil.Keymap.S));
