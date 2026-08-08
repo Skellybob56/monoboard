@@ -15,7 +15,7 @@ class Instrument : Singleton<Instrument>
 
 	readonly MidiManager midiManager;
 
-	public static byte RootTone { get; private set; }
+	public static sbyte RootTone { get; private set; }
 
 	public static int BaseOctave { get; private set; } = 4;
 	public static int OctaveShift { get; private set; } = 0;
