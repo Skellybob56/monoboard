@@ -3,7 +3,7 @@
 static class KeymapUtil
 {
 	[Flags]
-	public enum Keymap : byte
+	public enum Keymap : ushort
 	{
 		None = 0x00,
 
@@ -15,10 +15,12 @@ static class KeymapUtil
 		Up = 0x10,
 		Down = 0x20,
 		Sharp = 0x40,
-		ApplyOctave = 0x80,
+		Flat = 0x80,
+
+		ApplyOctave = 0x0100,
 
 		Notes = 0x0f,
-		Modifiers = 0x70,
+		Modifiers = 0xf0,
 		NoteModifers = Notes | Modifiers
 	}
 

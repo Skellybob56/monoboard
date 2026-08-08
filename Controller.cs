@@ -20,7 +20,7 @@ class Controller : Singleton<Controller>
 		differenceKeymap = CurrentKeymap;
 		CurrentKeymap = Keymap.None;
 
-		if (!MirrorMode && IsKeyDown(KeyboardKey.A)) { CurrentKeymap |= Keymap.A; }
+		if (IsKeyDown(KeyboardKey.A)) { CurrentKeymap |= MirrorMode? Keymap.Flat : Keymap.A; }
 		if (IsKeyDown(KeyboardKey.S)) { CurrentKeymap |= MirrorMode? Keymap.Sharp : Keymap.S; }
 		if (IsKeyDown(KeyboardKey.D)) { CurrentKeymap |= MirrorMode? Keymap.Down : Keymap.D; }
 		if (IsKeyDown(KeyboardKey.F)) { CurrentKeymap |= MirrorMode? Keymap.Up : Keymap.F; }
@@ -28,7 +28,7 @@ class Controller : Singleton<Controller>
 		if (IsKeyDown(KeyboardKey.J)) { CurrentKeymap |= MirrorMode? Keymap.F : Keymap.Up; }
 		if (IsKeyDown(KeyboardKey.K)) { CurrentKeymap |= MirrorMode? Keymap.D : Keymap.Down; }
 		if (IsKeyDown(KeyboardKey.L)) { CurrentKeymap |= MirrorMode? Keymap.S : Keymap.Sharp; }
-		if (MirrorMode && IsKeyDown(KeyboardKey.Semicolon)) { CurrentKeymap |= Keymap.A; }
+		if (IsKeyDown(KeyboardKey.Semicolon)) { CurrentKeymap |= MirrorMode? Keymap.A : Keymap.Flat; }
 
 		if (IsKeyDown(KeyboardKey.Space)) { CurrentKeymap |= Keymap.ApplyOctave; }
 

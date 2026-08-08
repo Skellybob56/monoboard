@@ -31,7 +31,7 @@ class Instrument : Singleton<Instrument>
 	private Instrument(MidiManager midiManager)
 	{
 		this.midiManager = midiManager;
-		RootTone = 2;
+		RootTone = -3;
 		(combinations, scale) = InitCombinationsAndScale(8, "Default", "Major");
 	}
 
@@ -83,7 +83,9 @@ class Instrument : Singleton<Instrument>
 		keymap = Controller.CurrentKeymap;
 
 		// update shifts
-		noteShift = keymap.HasFlag(Keymap.Sharp)? 1 : 0;
+		noteShift = 0;
+		noteShift += keymap.HasFlag(Keymap.Sharp)? 1 : 0;
+		noteShift -= keymap.HasFlag(Keymap.Flat)?  1 : 0;
 
 		{
 			int newOctaveShift = (keymap.HasFlag(Keymap.Up)? 1 : 0) + (keymap.HasFlag(Keymap.Down)? -1 : 0);

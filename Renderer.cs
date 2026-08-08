@@ -150,7 +150,7 @@ class Renderer : Singleton<Renderer>
 		DrawKey(keySetX + 5*keyBoxJump, keySetY, Glyph.J, Controller.CurrentKeymap.HasFlag(KeymapUtil.Keymap.Up));
 		DrawKey(keySetX + 6*keyBoxJump, keySetY, Glyph.K, Controller.CurrentKeymap.HasFlag(KeymapUtil.Keymap.Down));
 		DrawKey(keySetX + 7*keyBoxJump, keySetY, Glyph.L, Controller.CurrentKeymap.HasFlag(KeymapUtil.Keymap.Sharp));
-		DrawKey(keySetX + 8*keyBoxJump, keySetY, Glyph.Semicolon, false);
+		DrawKey(keySetX + 8*keyBoxJump, keySetY, Glyph.Semicolon, Controller.CurrentKeymap.HasFlag(KeymapUtil.Keymap.Flat));
 
 		DrawSpace(keySetX, spacebarY, Controller.CurrentKeymap.HasFlag(KeymapUtil.Keymap.ApplyOctave));
 	}
