@@ -14,6 +14,8 @@ class Renderer : Singleton<Renderer>
 	const int logoFontSize = 48;
 	readonly Font playingNoteFont;
 	const int playingNoteFontSize = 18;
+	readonly Font mappingSelectorFont;
+	const int mappingSelectorFontSize = 24;
 
 	private Renderer()
 	{
@@ -26,6 +28,9 @@ class Renderer : Singleton<Renderer>
 		playingNoteFont = LoadFontEx("assets/AtkinsonHyperlegibleNext-Regular.otf", playingNoteFontSize,
 			['A', 'B', 'C', 'D', 'E', 'F', 'G', '#', 'b',
 			 '-', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'], 20);
+
+		mappingSelectorFont = LoadFontEx("assets/AtkinsonHyperlegibleNext-Regular.otf", mappingSelectorFontSize,
+			['-', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'], 11);
 	}
 
 	// inputs
@@ -46,7 +51,7 @@ class Renderer : Singleton<Renderer>
 
 	const int logoHeight = logoFontSize;
 
-	const int mappingSelectorHeight = 24;
+	const int mappingSelectorHeight = mappingSelectorFontSize;
 	const int mappingSelectorMarginY = 6;
 
 	const int keyBoxWidth = 48;
@@ -158,7 +163,7 @@ class Renderer : Singleton<Renderer>
 		DrawLine(noteLineWindowWidth, logoDividerY, screenWidth, logoDividerY, dividerColor);
 
 		// todo: render RootTone as a note (also consider how to prevent the root tone from becoming a whole octave offset such as 12 instead of 0)
-		DrawTextEx(playingNoteFont, Instrument.RootTone.ToString(), new(mappingSelectorX, mappingSelectorY), playingNoteFontSize, 0f, Color.White);
+		DrawTextEx(mappingSelectorFont, Instrument.RootTone.ToString(), new(mappingSelectorX, mappingSelectorY), mappingSelectorFontSize, 0f, Color.White);
 
 		DrawLine(noteLineWindowWidth, mappingSelectorDividerY, screenWidth, mappingSelectorDividerY, dividerColor);
 
