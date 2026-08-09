@@ -1,4 +1,5 @@
-﻿using static Monoboard.KeymapUtil;
+﻿using Raylib_cs;
+using static Monoboard.KeymapUtil;
 
 namespace Monoboard;
 
@@ -77,6 +78,10 @@ class Instrument : Singleton<Instrument>
 	public void Update(double time)
 	{
 		// todo: assert that the length of combinations is the same as the length of notes
+
+		// todo: make these keys replacable (perhaps pass through Controller)
+		RootTone += (sbyte)(Raylib.IsKeyPressed(KeyboardKey.Up) ? 1 : 0);
+		RootTone -= (sbyte)(Raylib.IsKeyPressed(KeyboardKey.Down) ? 1 : 0);
 
 		// update keymaps
 		differenceKeymap = Controller.CurrentKeymap ^ keymap;
