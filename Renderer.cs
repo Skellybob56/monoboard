@@ -157,6 +157,9 @@ class Renderer : Singleton<Renderer>
 
 		DrawLine(noteLineWindowWidth, logoDividerY, screenWidth, logoDividerY, dividerColor);
 
+		// todo: render RootTone as a note (also consider how to prevent the root tone from becoming a whole octave offset such as 12 instead of 0)
+		DrawTextEx(smallFont, Instrument.RootTone.ToString(), new(mappingSelectorX, mappingSelectorY), smallFontSize, 0f, Color.White);
+
 		DrawLine(noteLineWindowWidth, mappingSelectorDividerY, screenWidth, mappingSelectorDividerY, dividerColor);
 
 		DrawKey(keySetX + 0*keyBoxJump, keySetY, Glyph.A, Controller.CurrentKeymap.HasFlag(KeymapUtil.Keymap.A));

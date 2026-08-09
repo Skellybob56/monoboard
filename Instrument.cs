@@ -79,9 +79,7 @@ class Instrument : Singleton<Instrument>
 	{
 		// todo: assert that the length of combinations is the same as the length of notes
 
-		// todo: make these keys replacable (perhaps pass through Controller)
-		RootTone += (sbyte)(Raylib.IsKeyPressed(KeyboardKey.Up) ? 1 : 0);
-		RootTone -= (sbyte)(Raylib.IsKeyPressed(KeyboardKey.Down) ? 1 : 0);
+		UpdateRootTone();
 
 		// update keymaps
 		differenceKeymap = Controller.CurrentKeymap ^ keymap;
@@ -107,6 +105,14 @@ class Instrument : Singleton<Instrument>
 		}
 
 		UpdateNote(time);
+	}
+
+	public void UpdateRootTone()
+	{
+		// todo: make these keys replacable (perhaps pass through Controller)
+		int RootToneChange = (Raylib.IsKeyPressed(KeyboardKey.Up) ? 1 : 0) - (Raylib.IsKeyPressed(KeyboardKey.Down) ? 1 : 0);
+		RootTone = (sbyte)(RootTone + RootToneChange);
+		if (RootToneChange != 0) { Program.ScheduleGraphicalUpdate(); }
 	}
 
 	void UpdateNote(double time)
