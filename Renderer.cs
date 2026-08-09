@@ -98,6 +98,9 @@ class Renderer : Singleton<Renderer>
 		const int noteLineY = baseOctaveY + baseOctaveHeight + noteLineMargin;
 		const int noteLineLength = screenHeight - noteLineY - noteLineMargin;
 		const int octaveHeight = noteLineLength/3;
+
+		const int activeOctaveSeparatorWidth = noteLineWindowWidth - 3*defaultMargin;
+		const int inactiveOctaveSeparatorWidth = 3*activeOctaveSeparatorWidth/4;
 		const int octaveSeparator1Y = noteLineY + 0*octaveHeight;
 		const int octaveSeparator2Y = noteLineY + 1*octaveHeight;
 		const int octaveSeparator3Y = noteLineY + 2*octaveHeight;
@@ -113,10 +116,15 @@ class Renderer : Singleton<Renderer>
 		DrawLine(defaultMargin, octaveSeparator3Y, defaultMargin, octaveSeparator4Y, Instrument.OctaveShift == -1? activeOctaveColor : inactiveOctaveColor);
 
 		// octave separators
-		DrawLine(defaultMargin, octaveSeparator1Y, noteLineWindowWidth - defaultMargin, octaveSeparator1Y, Instrument.OctaveShift ==  1? activeOctaveColor : inactiveOctaveColor);
-		DrawLine(defaultMargin, octaveSeparator2Y, noteLineWindowWidth - defaultMargin, octaveSeparator2Y, Instrument.OctaveShift != -1? activeOctaveColor : inactiveOctaveColor);
-		DrawLine(defaultMargin, octaveSeparator3Y, noteLineWindowWidth - defaultMargin, octaveSeparator3Y, Instrument.OctaveShift !=  1? activeOctaveColor : inactiveOctaveColor);
-		DrawLine(defaultMargin, octaveSeparator4Y, noteLineWindowWidth - defaultMargin, octaveSeparator4Y, Instrument.OctaveShift == -1? activeOctaveColor : inactiveOctaveColor);
+		DrawOctaveSeparator(octaveSeparator1Y, Instrument.OctaveShift ==  1);
+		DrawOctaveSeparator(octaveSeparator2Y, Instrument.OctaveShift != -1);
+		DrawOctaveSeparator(octaveSeparator3Y, Instrument.OctaveShift !=  1);
+		DrawOctaveSeparator(octaveSeparator4Y, Instrument.OctaveShift == -1);
+
+		void DrawOctaveSeparator(int y, bool active)
+		{
+			DrawLine(defaultMargin, y, defaultMargin + (active? activeOctaveSeparatorWidth : inactiveOctaveSeparatorWidth), y, active? activeOctaveColor : inactiveOctaveColor);
+		}
 
 		if (MidiManager.PlayingNote is not null)
 		{
