@@ -10,20 +10,20 @@ class Renderer : Singleton<Renderer>
 	{ return Register(new Renderer()); }
 
 	// fonts
-	readonly Font font;
-	const int fontSize = 48;
-	readonly Font smallFont;
-	const int smallFontSize = 18;
+	readonly Font logoFont;
+	const int logoFontSize = 48;
+	readonly Font playingNoteFont;
+	const int playingNoteFontSize = 18;
 
 	private Renderer()
 	{
 
-		font = LoadFontEx("assets/LibreBaskerville-VariableFont_wght.ttf", fontSize,
+		logoFont = LoadFontEx("assets/LibreBaskerville-VariableFont_wght.ttf", logoFontSize,
 			['M', 'O', 'N', 'B', 'A', 'R', 'D', // MONOBOARD
 			 'S', 'F', 'J', 'K', 'L', ';', // ASDF JKL;
 			 'C', 'E', 'G', '#', 'b'], 18); // A B C D E F G # b
 
-		smallFont = LoadFontEx("assets/AtkinsonHyperlegibleNext-Regular.otf", smallFontSize,
+		playingNoteFont = LoadFontEx("assets/AtkinsonHyperlegibleNext-Regular.otf", playingNoteFontSize,
 			['A', 'B', 'C', 'D', 'E', 'F', 'G', '#', 'b',
 			 '-', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'], 20);
 	}
@@ -41,10 +41,10 @@ class Renderer : Singleton<Renderer>
 	const int defaultMargin = 12;
 
 	const int noteLineWindowWidth = 64;
-	const int baseOctaveHeight = smallFontSize;
+	const int baseOctaveHeight = playingNoteFontSize;
 	const int noteLineMargin = 16;
 
-	const int logoHeight = fontSize;
+	const int logoHeight = logoFontSize;
 
 	const int mappingSelectorHeight = 24;
 	const int mappingSelectorMarginY = 6;
@@ -99,8 +99,8 @@ class Renderer : Singleton<Renderer>
 		const int octaveSeparator4Y = noteLineY + 3*octaveHeight;
 
 		string baseOctaveString = Instrument.BaseOctave.ToString();
-		int baseOctaveX = (int)MathF.Round(noteLineWindowWidth/2f - MeasureTextEx(smallFont, baseOctaveString, smallFontSize, 0).X/2f);
-		DrawTextEx(smallFont, baseOctaveString, new(baseOctaveX, baseOctaveY), smallFontSize, 0, Color.Red);
+		int baseOctaveX = (int)MathF.Round(noteLineWindowWidth/2f - MeasureTextEx(playingNoteFont, baseOctaveString, playingNoteFontSize, 0).X/2f);
+		DrawTextEx(playingNoteFont, baseOctaveString, new(baseOctaveX, baseOctaveY), playingNoteFontSize, 0, Color.Red);
 
 		// vertical line
 		DrawLine(defaultMargin, octaveSeparator1Y, defaultMargin, octaveSeparator2Y, Instrument.OctaveShift ==  1? activeOctaveColor : inactiveOctaveColor);
@@ -118,7 +118,7 @@ class Renderer : Singleton<Renderer>
 			byte playingNote = MidiManager.PlayingNote.Value;
 
 			const int playingNoteArrowWidth = 16;
-			const int playingNoteBoxWidth = 3*smallFontSize/2;
+			const int playingNoteBoxWidth = 3*playingNoteFontSize/2;
 			const int playingNoteOutlineThickness = 1;
 			const int noteTextOffsetY = 1;
 
@@ -127,38 +127,38 @@ class Renderer : Singleton<Renderer>
 			// todo: replace aliased solution with AA shader
 			DrawTriangleFan(
 				[
-					new(defaultMargin + playingNoteArrowWidth, playingNoteY - smallFontSize/2),
+					new(defaultMargin + playingNoteArrowWidth, playingNoteY - playingNoteFontSize/2),
 					new(defaultMargin, playingNoteY),
-					new(defaultMargin + playingNoteArrowWidth, playingNoteY + smallFontSize/2),
-					new(defaultMargin + playingNoteArrowWidth + playingNoteBoxWidth, playingNoteY + smallFontSize/2),
-					new(defaultMargin + playingNoteArrowWidth + playingNoteBoxWidth, playingNoteY - smallFontSize/2),
+					new(defaultMargin + playingNoteArrowWidth, playingNoteY + playingNoteFontSize/2),
+					new(defaultMargin + playingNoteArrowWidth + playingNoteBoxWidth, playingNoteY + playingNoteFontSize/2),
+					new(defaultMargin + playingNoteArrowWidth + playingNoteBoxWidth, playingNoteY - playingNoteFontSize/2),
 				],
 				5, playingNoteColor);
 			DrawTriangleFan(
 				[
-					new(defaultMargin + playingNoteArrowWidth, playingNoteY - smallFontSize/2 + playingNoteOutlineThickness),
+					new(defaultMargin + playingNoteArrowWidth, playingNoteY - playingNoteFontSize/2 + playingNoteOutlineThickness),
 					new(defaultMargin + playingNoteOutlineThickness+0.625f, playingNoteY), // +0.625 is a fudge to reduce aliasing
-					new(defaultMargin + playingNoteArrowWidth, playingNoteY + smallFontSize/2 - playingNoteOutlineThickness),
-					new(defaultMargin + playingNoteArrowWidth + playingNoteBoxWidth - playingNoteOutlineThickness, playingNoteY + smallFontSize/2 - playingNoteOutlineThickness),
-					new(defaultMargin + playingNoteArrowWidth + playingNoteBoxWidth - playingNoteOutlineThickness, playingNoteY - smallFontSize/2 + playingNoteOutlineThickness),
+					new(defaultMargin + playingNoteArrowWidth, playingNoteY + playingNoteFontSize/2 - playingNoteOutlineThickness),
+					new(defaultMargin + playingNoteArrowWidth + playingNoteBoxWidth - playingNoteOutlineThickness, playingNoteY + playingNoteFontSize/2 - playingNoteOutlineThickness),
+					new(defaultMargin + playingNoteArrowWidth + playingNoteBoxWidth - playingNoteOutlineThickness, playingNoteY - playingNoteFontSize/2 + playingNoteOutlineThickness),
 				],
 				5, backgroundColor);
 
 			const string noteDisplay = "C C#D D#E F F#G G#A A#B "; // todo: this system needs to be expanded to use flats and maybe even double sharps and flats to best notate the scale. it will also need to be unified with the scale 
-			DrawTextEx(smallFont, noteDisplay.Substring(playingNote%12 * 2, 2),
-				new(defaultMargin + playingNoteArrowWidth, playingNoteY - smallFontSize/2 + noteTextOffsetY),
-				smallFontSize, 0, playingNoteColor);
+			DrawTextEx(playingNoteFont, noteDisplay.Substring(playingNote%12 * 2, 2),
+				new(defaultMargin + playingNoteArrowWidth, playingNoteY - playingNoteFontSize/2 + noteTextOffsetY),
+				playingNoteFontSize, 0, playingNoteColor);
 		}
 	}
 
 	void DrawMainWindow()
 	{
-		DrawTextEx(font, "MONOBOARD", new(logoTextX, logoTextY), fontSize, 30, logoColor);
+		DrawTextEx(logoFont, "MONOBOARD", new(logoTextX, logoTextY), logoFontSize, 30, logoColor);
 
 		DrawLine(noteLineWindowWidth, logoDividerY, screenWidth, logoDividerY, dividerColor);
 
 		// todo: render RootTone as a note (also consider how to prevent the root tone from becoming a whole octave offset such as 12 instead of 0)
-		DrawTextEx(smallFont, Instrument.RootTone.ToString(), new(mappingSelectorX, mappingSelectorY), smallFontSize, 0f, Color.White);
+		DrawTextEx(playingNoteFont, Instrument.RootTone.ToString(), new(mappingSelectorX, mappingSelectorY), playingNoteFontSize, 0f, Color.White);
 
 		DrawLine(noteLineWindowWidth, mappingSelectorDividerY, screenWidth, mappingSelectorDividerY, dividerColor);
 
@@ -199,7 +199,7 @@ class Renderer : Singleton<Renderer>
 			_ => throw new ArgumentException("Glyph enum value not recognized.", nameof(glyph))
 		};
 
-		DrawTextCodepoint(font, character, new Vector2(x, y) + offset, fontSize, color);
+		DrawTextCodepoint(logoFont, character, new Vector2(x, y) + offset, logoFontSize, color);
 	}
 
 	void DrawSpace(int x, int y, bool pressed)
