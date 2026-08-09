@@ -17,26 +17,12 @@ internal static class Program
 	static Instrument instrument;
 	static Renderer renderer;
 
-	public static readonly Font font;
-	public const int fontSize = 48;
-	public static readonly Font smallFont;
-	public const int smallFontSize = 18;
-
 	static bool updateGraphics = false;
 
 	static Program()
 	{
 		InitWindow(Renderer.screenWidth, Renderer.screenHeight, "Monoboard");
 		SetExitKey(KeyboardKey.Null);
-
-		font = LoadFontEx("assets/LibreBaskerville-VariableFont_wght.ttf", fontSize,
-			['M', 'O', 'N', 'B', 'A', 'R', 'D', // MONOBOARD
-			 'S', 'F', 'J', 'K', 'L', ';', // ASDF JKL;
-			 'C', 'E', 'G', '#', 'b'], 18); // A B C D E F G # b
-
-		smallFont = LoadFontEx("assets/AtkinsonHyperlegibleNext-Regular.otf", smallFontSize,
-			['A', 'B', 'C', 'D', 'E', 'F', 'G', '#', 'b',
-			 '-', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'], 20);
 
 		controller = Controller.Create();
 		midiManager = MidiManager.Create();
