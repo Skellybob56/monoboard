@@ -16,7 +16,18 @@ class Instrument : Singleton<Instrument>
 
 	readonly MidiManager midiManager;
 
-	public static sbyte RootTone { get; private set; }
+	public static sbyte RootTone
+	{
+		get;
+		private set
+		{
+			// ensure a reasonable value for RootTone (to prevent RootTone acting as an octave shift)
+			while (value > 6) { value -= 12; }
+			while (value <= -6) { value += 12; }
+
+			field = value;
+		}
+	}
 
 	public static int BaseOctave { get; private set; } = 4;
 	public static int OctaveShift { get; private set; } = 0;
@@ -107,12 +118,16 @@ class Instrument : Singleton<Instrument>
 		UpdateNote(time);
 	}
 
-	public void UpdateRootTone()
+	void UpdateRootTone()
 	{
 		// todo: make these keys replacable (perhaps pass through Controller)
 		int RootToneChange = (Raylib.IsKeyPressed(KeyboardKey.Up) ? 1 : 0) - (Raylib.IsKeyPressed(KeyboardKey.Down) ? 1 : 0);
-		RootTone = (sbyte)(RootTone + RootToneChange);
-		if (RootToneChange != 0) { Program.ScheduleGraphicalUpdate(); }
+
+		if (RootToneChange != 0)
+		{
+			RootTone = (sbyte)(RootTone + RootToneChange);
+			Program.ScheduleGraphicalUpdate();
+		}
 	}
 
 	void UpdateNote(double time)
