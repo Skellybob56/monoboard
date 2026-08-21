@@ -19,7 +19,7 @@ internal static class Program
 
 	static bool updateGraphics = false;
 
-	static Program()
+	static void Init()
 	{
 		InitWindow(Renderer.screenWidth, Renderer.screenHeight, "Monoboard");
 		SetExitKey(KeyboardKey.Null);
@@ -39,6 +39,8 @@ internal static class Program
 	[System.STAThread]
 	public static void Main()
 	{
+		Init();
+
 		timeBeginPeriod(1);
 		while (!WindowShouldClose())
 		{
