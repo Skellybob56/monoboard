@@ -45,18 +45,9 @@ class Instrument : Singleton<Instrument>
 		this.midiManager = midiManager;
 
 		RootTone = 0;
-		(combinations, scale) = GetCombinationsAndScale(6, "Default", "Pentatonic Major");
+		(combinations, scale) = FileReader.GetCombinationsAndScale("Pentatonic Major");
 
 		DebugOutputNoteGuide(combinations, scale);
-	}
-
-	static (Keymap[] combinations, sbyte[] scale) GetCombinationsAndScale(int scaleSize, string combinationsFilename, string scaleFilename)
-	{
-		string sizePrefix = scaleSize.ToString() + " - ";
-		Keymap[] combinations = FileReader.GetCombinations(sizePrefix + combinationsFilename);
-		sbyte[] scale = FileReader.GetScale(sizePrefix + scaleFilename, combinations.Length);
-
-		return (combinations, scale);
 	}
 
 

@@ -1,106 +1,108 @@
-﻿using static Monoboard.KeymapUtil;
+﻿using System.Diagnostics;
+using System.Text;
+using static Monoboard.KeymapUtil;
 
 namespace Monoboard;
 
 static class FileReader
 {
-    const string combinationsFolder = "assets/patterns/";
-    const string combinationsExtention = ".kmap";
-    const string scaleFolder = "assets/patterns/";
-    const string scaleExtention = ".nmap";
+	const string patternFolder = "assets/patterns/";
+	const string patternExtension = ".monpa";
 
-    public static Keymap[] GetCombinations(string filename)
-    {
-        // todo: modernise this to not assume that the note input mask is 1111 0000
-        string path = combinationsFolder + filename + combinationsExtention;
-        StreamReader streamReader = new StreamReader(path);
+	const string whitespace = "\t\r\n ,";
 
-        int position = 0;
-        List<Keymap> combinations = [];
-        Keymap? currentKeymap = null;
-        for (char character = (char)streamReader.Read(); !streamReader.EndOfStream; character = (char)streamReader.Read())
-        {
-            if (currentKeymap.HasValue) // keep reading current run
-            {
-                position++;
-                if (position > 3) { throw new Exception($"Combination file at '{path}' contains a keymap that is more than 4 digits in length."); }
-                if (character != '.' && character != '!') { throw new Exception($"Combination file at '{path}' contains a keymap that is less than 4 digits in length."); }
+	public static (Keymap[] combinations, sbyte[] scale) GetCombinationsAndScale(string filename)
+	{
+		string path = patternFolder + filename + patternExtension;
+		string pattern = File.ReadAllText(path);
 
-                if (position == 3) // last digit in run
-                {
-                    // add last digit
-                    if (character == '!') { currentKeymap |= Keymap.F; }
+		List<Keymap> combinations = [];
+		List<sbyte> scale = [];
 
-                    // append to array and clear currentKeymap
-                    combinations.Add(currentKeymap.Value);
-                    currentKeymap = null;
-                    continue;
-                }
-                if (character == '!')
-                {
-                    if (position == 2) { currentKeymap |= Keymap.D; }
-                    else if (position == 1) { currentKeymap |= Keymap.S; }
-                }
-            }
-            else if (character == '.' || character == '!')
-            {
-                currentKeymap = character == '!' ? Keymap.A : Keymap.None;
-                position = 0;
-            }
-        }
+		int cursor = 0;
+		while (true)
+		{
+			Keymap? combination = TryReadKeymap(pattern, ref cursor);
+			if (combination is null) { break; }
+			else
+			{
+				combinations.Add(combination.Value);
 
-        // todo: check if there are any repetitions and throw an exception if so
+				scale.Add(ReadSByte(pattern, ref cursor));
+			}
+		}
 
-        return combinations.ToArray();
-    }
+		Debug.Assert(combinations.Count == scale.Count);
 
-    public static sbyte[] GetScale(string filename, int correctLength)
-    {
-        const string numbers = "0123456789";
+		// todo: check for keymap repetitions
+		return (combinations.ToArray(), scale.ToArray());
+	}
 
-        string path = scaleFolder + filename + scaleExtention;
-        StreamReader streamReader = new StreamReader(path);
+	static Keymap? TryReadKeymap(string pattern, ref int cursor)
+	{
+		const char keyPressedChar = '!';
+		const char keyUnpressedChar = '.';
 
-        List<sbyte> scale = [];
-        int? currentNote = null;
-        bool negative = false;
-        for (char character; !streamReader.EndOfStream; )
-        {
-            character = (char)streamReader.Read();
+		SkipWhitespace(pattern, ref cursor);
+		if (cursor >= pattern.Length) { return null; }
 
-            if (currentNote.HasValue)
-            {
-                if (numbers.Contains(character)) // new digit
-                {
-                    currentNote *= 10;
-                    currentNote += (sbyte)(character - numbers[0]);
-                }
-                else // number ended
-                {
-                    scale.Add((sbyte)(negative? -currentNote.Value : currentNote.Value));
-                    currentNote = null;
-                    negative = false;
-                }
-            }
-            else if (character == '-')
-            {
-                negative = true;
-            }
-            else if (numbers.Contains(character))
-            {
-                currentNote = (sbyte)(character - numbers[0]);
-            }
-        }
-        if (currentNote.HasValue) // number ended at eof
-        {
-            scale.Add((sbyte)(negative ? -currentNote.Value : currentNote.Value));
-            currentNote = null;
-            negative = false;
-        }
+		Keymap keymap = Keymap.None;
+		foreach (Keymap key in keymapNoteKeys)
+		{
+			if (cursor >= pattern.Length) { throw new FormatException("EOF occurred while reading a keymap."); }
 
-        if (scale.Count != correctLength)
-        { throw new Exception("The number of notes loaded is not equal to the number of combinations."); }
+			char symbol = pattern[cursor];
 
-        return scale.ToArray();
-    }
+			if (symbol == keyPressedChar)
+			{
+				keymap |= key;
+			}
+			else if (symbol != keyUnpressedChar)
+			{
+				throw new FormatException($"'{symbol}' found at character {cursor} where a keymap was expected. Keymaps can only use '{keyPressedChar}' for pressed keys and '{keyUnpressedChar}' for unpressed keys.");
+			}
+
+			cursor++;
+		}
+
+		return keymap;
+	}
+
+	static sbyte ReadSByte(string pattern, ref int cursor)
+	{
+		SkipWhitespace(pattern, ref cursor);
+		if (cursor >= pattern.Length) { throw new FormatException("The final keymap combination is not followed by a note integer."); }
+
+		int integerStartPosition = cursor; // only used for later exceptions
+
+		bool negative = pattern[cursor] == '-';
+		if (negative) { cursor++; SkipWhitespace(pattern, ref cursor); }
+
+		const int earlyBreakSize = ushort.MaxValue;
+		if (!char.IsBetween(pattern[cursor], '0', '9')) { throw new FormatException($"Digit expected at character {cursor} instead of '{pattern[cursor]}'"); }
+
+		int value = 0;
+		while (char.IsBetween(pattern[cursor], '0', '9'))
+		{
+			int digit = pattern[cursor] - '0';
+			value *= 10;
+			value += digit;
+
+			if (value >= earlyBreakSize) { break; } // prevent extremely long numbers from overflowing the integer - this is already big enough to throw an error later
+
+			cursor++;
+		}
+
+		value = negative? -value : value;
+
+		if (value > sbyte.MaxValue) { throw new FormatException($"The note integer '{value}' at character {integerStartPosition} is greater than {sbyte.MaxValue}. Note integers must be less than {sbyte.MaxValue}"); }
+		if (value < sbyte.MinValue) { throw new FormatException($"The note integer '{value}' at character {integerStartPosition} is less than {sbyte.MinValue}. Note integers must be greater than {sbyte.MinValue}"); }
+
+		return (sbyte)value;
+	}
+
+	static void SkipWhitespace(string pattern, ref int cursor)
+	{
+		while (cursor < pattern.Length && whitespace.Contains(pattern[cursor])) { cursor++; }
+	}
 }

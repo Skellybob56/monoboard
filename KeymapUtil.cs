@@ -35,4 +35,6 @@ static class KeymapUtil
 
 		return new string(output);
 	}
+
+	public static Keymap[] keymapNoteKeys = [Keymap.A, Keymap.S, Keymap.D, Keymap.F];
 }
