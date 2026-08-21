@@ -43,17 +43,18 @@ class Instrument : Singleton<Instrument>
 	private Instrument(MidiManager midiManager)
 	{
 		this.midiManager = midiManager;
-		RootTone = -3;
-		(combinations, scale) = InitCombinationsAndScale(8, "Default", "Major");
+
+		RootTone = 0;
+		(combinations, scale) = GetCombinationsAndScale(6, "Default", "Pentatonic Major");
+
+		DebugOutputNoteGuide(combinations, scale);
 	}
 
-	static (Keymap[] combinations, sbyte[] scale) InitCombinationsAndScale(int scaleSize, string combinationsFilename, string scaleFilename)
+	static (Keymap[] combinations, sbyte[] scale) GetCombinationsAndScale(int scaleSize, string combinationsFilename, string scaleFilename)
 	{
 		string sizePrefix = scaleSize.ToString() + " - ";
 		Keymap[] combinations = FileReader.GetCombinations(sizePrefix + combinationsFilename);
 		sbyte[] scale = FileReader.GetScale(sizePrefix + scaleFilename, combinations.Length);
-
-		DebugOutputNoteGuide(combinations, scale);
 
 		return (combinations, scale);
 	}
