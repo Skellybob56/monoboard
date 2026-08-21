@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics;
-using System.Text;
 using static Monoboard.KeymapUtil;
 
 namespace Monoboard;
@@ -16,16 +15,23 @@ static class FileReader
 		string path = patternFolder + filename + patternExtension;
 		string pattern = File.ReadAllText(path);
 
-		List<Keymap> combinations = [];
-		List<sbyte> scale = [];
+		List<Keymap> combinations = new(16);
+		List<sbyte> scale = new(16);
 
 		int cursor = 0;
+		ushort seenKeymaps = 0x0000; // bitmask for the 16 possible keymaps. high bit is !!!!, low bit is .... (technically invalid)
 		while (true)
 		{
 			Keymap? combination = TryReadKeymap(pattern, ref cursor);
 			if (combination is null) { break; }
 			else
 			{
+				// check for keymap repetitions
+				Debug.Assert((ushort)combination.Value < 16); // pure note combinations should be 0 to 15
+				ushort keymapCode = (ushort)(1 << (ushort)combination.Value);
+				if ((seenKeymaps & keymapCode) != 0) { throw new FormatException($"Duplicate combination, '{combination.Value}' found at character {cursor-4}."); }
+				seenKeymaps |= keymapCode;
+
 				combinations.Add(combination.Value);
 
 				scale.Add(ReadSByte(pattern, ref cursor));
@@ -34,7 +40,6 @@ static class FileReader
 
 		Debug.Assert(combinations.Count == scale.Count);
 
-		// todo: check for keymap repetitions
 		return (combinations.ToArray(), scale.ToArray());
 	}
 
@@ -64,6 +69,8 @@ static class FileReader
 
 			cursor++;
 		}
+
+		if (keymap == Keymap.None) { throw new FormatException($"The keymap at character {cursor-4} is empty ('{new string(keyUnpressedChar, 4)}'). Keymaps are not allowed to be empty"); }
 
 		return keymap;
 	}
