@@ -10,6 +10,21 @@ static class FileReader
 
 	const string whitespace = "\t\r\n ,";
 
+	static string[] GetAllPatternNames()
+	{
+		List<string> patternNames = [];
+		foreach (string fileName in Directory.EnumerateFiles(patternFolder))
+		{
+			if (fileName.EndsWith(patternExtension))
+			{
+				// todo: consider pruning invalid names (e.g. bad whitespace)
+				patternNames.Add(fileName[..^patternExtension.Length]);
+			}
+		}
+
+		return patternNames.ToArray();
+	}
+
 	public static (Keymap[] combinations, sbyte[] scale) GetCombinationsAndScale(string filename)
 	{
 		string path = patternFolder + filename + patternExtension;
