@@ -45,37 +45,7 @@ class Instrument : Singleton<Instrument>
 		this.midiManager = midiManager;
 
 		RootTone = 0;
-		(combinations, scale) = FileReader.GetCombinationsAndScale("Pentatonic Major");
-
-		DebugOutputNoteGuide(combinations, scale);
-	}
-
-
-	static void DebugOutputNoteGuide(ReadOnlySpan<Keymap> combinations, ReadOnlySpan<sbyte> scale)
-	{
-		for (int i = 0; i < combinations.Length; i++)
-		{
-			Console.WriteLine(DebugOutputOfSingleNote(combinations[i], RootTone + scale[i]));
-		}
-
-		string DebugOutputOfSingleNote(Keymap combination, int note)
-		{
-			// todo: use flat or sharp depending selected scale
-			const string noteDisplay = "C C#D D#E F F#G G#A A#B ";
-
-			// todo: generalize this as it assumes that noteInputMask is 1111 0000
-			string combinationString = combination.KeymapToString()[..4];
-
-			int tone = note;
-			int octave = 4;
-			while (tone < 0)
-			{ tone += 12; octave -= 1; }
-			while (tone >= 12)
-			{ tone -= 12; octave += 1; }
-			string toneString = noteDisplay.Substring(tone*2, 2);
-
-			return new string(combinationString.Reverse().ToArray()) + $" {toneString}{octave} " + combinationString;
-		}
+		(combinations, scale) = FileReader.GetCombinationsAndScale("Major");
 	}
 
 	public void Update(double time)
