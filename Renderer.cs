@@ -11,7 +11,9 @@ class Renderer : Singleton<Renderer>
 
 	// fonts
 	readonly Font logoFont;
-	const int logoFontSize = 48;
+	const int logoFontSize = 64;
+	readonly Font keyFont;
+	const int keyFontSize = 44;
 	readonly Font playingNoteFont;
 	const int playingNoteFontSize = 18;
 	readonly Font mappingSelectorFont;
@@ -19,11 +21,11 @@ class Renderer : Singleton<Renderer>
 
 	private Renderer()
 	{
+		logoFont = LoadFontEx("assets/CooperMdBT-Regular.ttf", logoFontSize,
+			['M', 'O', 'N', 'B', 'A', 'R', 'D'], 7); // MONOBOARD
 
-		logoFont = LoadFontEx("assets/LibreBaskerville-VariableFont_wght.ttf", logoFontSize,
-			['M', 'O', 'N', 'B', 'A', 'R', 'D', // MONOBOARD
-			 'S', 'F', 'J', 'K', 'L', ';', // ASDF JKL;
-			 'C', 'E', 'G', '#', 'b'], 18); // A B C D E F G # b
+		keyFont = LoadFontEx("assets/CooperLtBT-Regular.ttf", keyFontSize,
+			['A', 'S', 'D', 'F', 'J', 'K', 'L', ';'], 8);
 
 		playingNoteFont = LoadFontEx("assets/AtkinsonHyperlegibleNext-Regular.otf", playingNoteFontSize,
 			['A', 'B', 'C', 'D', 'E', 'F', 'G', '#', 'b',
@@ -166,12 +168,13 @@ class Renderer : Singleton<Renderer>
 
 	void DrawMainWindow()
 	{
-		DrawTextEx(logoFont, "MONOBOARD", new(logoTextX, logoTextY), logoFontSize, 30, logoColor);
+		DrawTextEx(logoFont, "MONOBOARD", new(logoTextX, logoTextY), logoFontSize, 13, logoColor);
 
 		DrawLine(noteLineWindowWidth, logoDividerY, screenWidth, logoDividerY, dividerColor);
 
-		// todo: render RootTone as a note (also consider how to prevent the root tone from becoming a whole octave offset such as 12 instead of 0)
+		// todo: render RootTone as a note
 		DrawTextEx(mappingSelectorFont, Instrument.RootTone.ToString(), new(mappingSelectorX, mappingSelectorY), mappingSelectorFontSize, 0f, Color.White);
+		// todo: add dropdown for changing the mapping
 
 		DrawLine(noteLineWindowWidth, mappingSelectorDividerY, screenWidth, mappingSelectorDividerY, dividerColor);
 
@@ -201,18 +204,18 @@ class Renderer : Singleton<Renderer>
 
 		Vector2 offset = glyph switch
 		{
-			Glyph.A => new(8, 2),
-			Glyph.S => new(11, 2),
-			Glyph.D => new(7, 2),
-			Glyph.F => new(10, 2),
-			Glyph.J => new(18, -1),
-			Glyph.K => new(8, 2),
-			Glyph.L => new(9, 2),
+			Glyph.A => new( 8, 6),
+			Glyph.S => new(11, 6),
+			Glyph.D => new( 7, 6),
+			Glyph.F => new(10, 6),
+			Glyph.J => new(12, 6),
+			Glyph.K => new( 8, 6),
+			Glyph.L => new( 9, 6),
 			Glyph.Semicolon => new(18, -2),
 			_ => throw new ArgumentException("Glyph enum value not recognized.", nameof(glyph))
 		};
 
-		DrawTextCodepoint(logoFont, character, new Vector2(x, y) + offset, logoFontSize, color);
+		DrawTextCodepoint(keyFont, character, new Vector2(x, y) + offset, keyFontSize, color);
 	}
 
 	void DrawSpace(int x, int y, bool pressed)
