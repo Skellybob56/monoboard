@@ -41,6 +41,10 @@ internal static class Program
 	{
 		Init();
 
+		Image logo = LoadImage("assets/logo.png");
+		SetWindowIcon(logo);
+		UnloadImage(logo);
+
 		timeBeginPeriod(1);
 		while (!WindowShouldClose())
 		{
