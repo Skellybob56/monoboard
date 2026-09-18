@@ -115,8 +115,7 @@ class Instrument : Singleton<Instrument>
 		}
 		else
 		{
-			// todo: this shouldn't trigger on releasing Keymap.ApplyOctave
-			if (differenceKeymap != Keymap.None)
+			if ((differenceKeymap & Keymap.NoteModifers) != Keymap.None)
 			{ changeCheckTime = time + checkTimeOffset; } // if note changed
 		}
 	}

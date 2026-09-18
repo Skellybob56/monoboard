@@ -13,7 +13,7 @@ static partial class TEVirtualMidi
 		InstantiateTX = 0b1000,
 		InstantiateBoth = 0b1100
 	}
-	
+
 	[LibraryImport("teVirtualMIDI64.dll", EntryPoint = "virtualMIDISendData")]
 	[return: MarshalAs(UnmanagedType.Bool)]
 	public static partial bool virtualMIDISendData(nint lpvmMidiPort, ReadOnlySpan<byte> midiDataBytes, uint length);
