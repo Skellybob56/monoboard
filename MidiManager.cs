@@ -41,13 +41,19 @@ class MidiManager : Singleton<MidiManager>
 
 		if (PlayingNote == newNote) { return; } // note is already playing
 
-		if (!startNoteBeforeEndNote && PlayingNote is not null)
-		{ TEVirtualMidi.virtualMIDISendData(MidiPortHandler.LpvmMidiPort, [0x80, PlayingNote.Value, 0x00], 3); }
+		if (!startNoteBeforeEndNote) {
+			if(PlayingNote is not null) {
+				TEVirtualMidi.virtualMIDISendData(MidiPortHandler.LpvmMidiPort, [0x80, PlayingNote.Value, 0x00], 3);
+			}
+		}
 
 		TEVirtualMidi.virtualMIDISendData(MidiPortHandler.LpvmMidiPort, [0x90, newNote, noteVelocity], 3);
 
-		if (startNoteBeforeEndNote && PlayingNote is not null)
-		{ TEVirtualMidi.virtualMIDISendData(MidiPortHandler.LpvmMidiPort, [0x80, PlayingNote.Value, 0x00], 3); }
+		if (startNoteBeforeEndNote) {
+			if(PlayingNote is not null) {
+				TEVirtualMidi.virtualMIDISendData(MidiPortHandler.LpvmMidiPort, [0x80, PlayingNote.Value, 0x00], 3);
+			}
+		}
 
 		PlayingNote = newNote;
 	}
