@@ -10,7 +10,7 @@ class MidiManager : Singleton<MidiManager>
 
 	const string midiDeviceName = "monoboard";
 	const byte noteVelocity = 80; // limited to a 7 bit integer (80 is considered mf in musical volume)
-	const bool startNoteBeforeEndNote = true; // when swapping between two notes, this will start the next note before ending the last which can prevent monophonic clicking
+	static readonly bool startNoteBeforeEndNote = true; // when swapping between two notes, this will start the next note before ending the last which can prevent monophonic clicking
 
 	public static byte? PlayingNote { get; private set; } = null;
 
@@ -41,19 +41,10 @@ class MidiManager : Singleton<MidiManager>
 
 		if (PlayingNote == newNote) { return; } // note is already playing
 
-		if (!startNoteBeforeEndNote) {
-			if(PlayingNote is not null) {
-				TEVirtualMidi.virtualMIDISendData(MidiPortHandler.LpvmMidiPort, [0x80, PlayingNote.Value, 0x00], 3);
-			}
-		}
+		void SendOff() { if (PlayingNote is not null) TEVirtualMidi.virtualMIDISendData(MidiPortHandler.LpvmMidiPort, [0x80, PlayingNote.Value, 0x00], 3); }
+		void SendOn() { TEVirtualMidi.virtualMIDISendData(MidiPortHandler.LpvmMidiPort, [0x90, newNote, noteVelocity], 3); }
 
-		TEVirtualMidi.virtualMIDISendData(MidiPortHandler.LpvmMidiPort, [0x90, newNote, noteVelocity], 3);
-
-		if (startNoteBeforeEndNote) {
-			if(PlayingNote is not null) {
-				TEVirtualMidi.virtualMIDISendData(MidiPortHandler.LpvmMidiPort, [0x80, PlayingNote.Value, 0x00], 3);
-			}
-		}
+		if (startNoteBeforeEndNote) { SendOn(); SendOff(); } else { SendOff(); SendOn(); }
 
 		PlayingNote = newNote;
 	}
