@@ -56,9 +56,9 @@ class Renderer : Singleton<Renderer>
 	const int mappingSelectorHeight = mappingSelectorFontSize;
 	const int mappingSelectorMarginY = 6;
 
-	const int keyBoxWidth = 48;
+	const int keyBoxWidth = 56;
 	const int keyBoxHeight = keyBoxWidth;
-	const int keyBoxSpacing = 15;
+	const int keyBoxSpacing = 7;
 	const int keyPressedSink = 6;
 
 	// maths
@@ -82,6 +82,9 @@ class Renderer : Singleton<Renderer>
 
 	public const int screenWidth = keySetX + spacebarWidth + defaultMargin;
 	public const int screenHeight = spacebarY + keyBoxHeight + defaultMargin;
+
+	// todo: vary glsl version by platform (330 for PC, 100 for android and web)
+	static Shader roundedSquareShader = LoadShader(null, "assets/shaders/rounded_box.fs");
 
 	public void Render()
 	{
@@ -194,8 +197,39 @@ class Renderer : Singleton<Renderer>
 	void DrawKey(int x, int y, Glyph glyph, bool pressed)
 	{
 		int yOffset = pressed? keyPressedSink : 0;
-		DrawOutlinedBox(x, y + yOffset, keyBoxWidth, keyBoxHeight, pressed? keyPressedColor : keyColor, 1, backgroundColor);
-		DrawGlyph(x, y + yOffset, glyph, pressed? keyPressedColor : keyColor);
+		// DrawOutlinedBox(x, y + yOffset, keyBoxWidth, keyBoxHeight, pressed? keyPressedColor : keyColor, 1, backgroundColor);
+
+		// todo: draw all boxes first to allow for proper batching
+		BeginShaderMode(roundedSquareShader);
+		// top left, bottom left, bottom right, top right
+		DrawRectangleUV(new(x, y + yOffset, keyBoxWidth, keyBoxHeight), pressed? keyPressedColor : keyColor);
+		EndShaderMode();
+
+		DrawGlyph(x, y + yOffset, glyph, backgroundColor);
+	}
+
+	static void DrawRectangleUV(Rectangle rec, Color tint)
+	{
+		Rlgl.Begin(7); // quad mode
+		{
+			// set color and normal
+			Rlgl.Color4f(tint.R/255f, tint.G/255f, tint.B/255f, tint.A/255f);
+			Rlgl.Normal3f(0f, 0f, 1f);
+
+			// define all four vertices
+			Rlgl.TexCoord2f(0f, 0f); // top left
+			Rlgl.Vertex2f(rec.Position.X, rec.Position.Y);
+
+			Rlgl.TexCoord2f(0f, 1f); // bottom left
+			Rlgl.Vertex2f(rec.Position.X, rec.Position.Y + rec.Size.Y);
+
+			Rlgl.TexCoord2f(1f, 1f); // bottom right
+			Rlgl.Vertex2f(rec.Position.X + rec.Size.X, rec.Position.Y + rec.Size.Y);
+
+			Rlgl.TexCoord2f(1f, 0f); // top right
+			Rlgl.Vertex2f(rec.Position.X + rec.Size.X, rec.Position.Y);
+		}
+		Rlgl.End();
 	}
 
 	void DrawGlyph(int x, int y, Glyph glyph, Color color)
@@ -204,13 +238,13 @@ class Renderer : Singleton<Renderer>
 
 		Vector2 offset = glyph switch
 		{
-			Glyph.A => new( 8, 6),
-			Glyph.S => new(11, 6),
-			Glyph.D => new( 7, 6),
-			Glyph.F => new(10, 6),
-			Glyph.J => new(12, 6),
-			Glyph.K => new( 8, 6),
-			Glyph.L => new( 9, 6),
+			Glyph.A => new(12, 10),
+			Glyph.S => new(15, 10),
+			Glyph.D => new(11, 10),
+			Glyph.F => new(14, 10),
+			Glyph.J => new(16, 10),
+			Glyph.K => new(12, 10),
+			Glyph.L => new(13, 10),
 			Glyph.Semicolon => new(18, -2),
 			_ => throw new ArgumentException("Glyph enum value not recognized.", nameof(glyph))
 		};
