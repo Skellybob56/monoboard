@@ -21,7 +21,7 @@ static class KeymapUtil
 
 		Notes = 0x0f,
 		Modifiers = 0xf0,
-		NoteModifers = Notes | Modifiers
+		NoteModifiers = Notes | Modifiers
 	}
 
 	public static string KeymapToString(this Keymap keymap)

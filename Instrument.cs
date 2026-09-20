@@ -115,7 +115,7 @@ class Instrument : Singleton<Instrument>
 		}
 		else
 		{
-			if ((differenceKeymap & Keymap.NoteModifers) != Keymap.None)
+			if ((differenceKeymap & Keymap.NoteModifiers) != Keymap.None)
 			{ changeCheckTime = time + checkTimeOffset; } // if note changed
 		}
 	}
