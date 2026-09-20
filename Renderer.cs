@@ -197,11 +197,9 @@ class Renderer : Singleton<Renderer>
 	void DrawKey(int x, int y, Glyph glyph, bool pressed)
 	{
 		int yOffset = pressed? keyPressedSink : 0;
-		// DrawOutlinedBox(x, y + yOffset, keyBoxWidth, keyBoxHeight, pressed? keyPressedColor : keyColor, 1, backgroundColor);
 
 		// todo: draw all boxes first to allow for proper batching
 		BeginShaderMode(roundedSquareShader);
-		// top left, bottom left, bottom right, top right
 		DrawRectangleUV(new(x, y + yOffset, keyBoxWidth, keyBoxHeight), pressed? keyPressedColor : keyColor);
 		EndShaderMode();
 
