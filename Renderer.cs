@@ -43,10 +43,11 @@ class Renderer : Singleton<Renderer>
 	static readonly Color activeOctaveColor = Color.White;
 	static readonly Color inactiveOctaveColor = Color.Gray;
 	static readonly Color playingNoteColor = Color.Red;
-	static readonly ImmutableArray<Color> keyColors = [
-		new(195,  88,  89), new( 90, 122, 159), new( 97, 163, 121), new(228, 159,  94), // ASDF
-		new(198, 192, 151), new(198, 192, 151), new(190, 199, 199), new(190, 199, 199), // JKL;
-		Color.White
+	static readonly Color keyColor = new(213, 208, 180);
+	static readonly ImmutableArray<Color> keyPressedColors = [
+		new(144,  58,  59), new( 59,  87, 115), new( 56,  92,  73), new(166, 109,  56), // ASDF
+		new(117, 114,  98), new(117, 114,  98), new(111, 118, 119), new(111, 118, 119), // JKL;
+		Color.Gray
 	];
 
 	const int defaultMargin = 12;
@@ -185,26 +186,27 @@ class Renderer : Singleton<Renderer>
 
 		DrawLine(noteLineWindowWidth, mappingSelectorDividerY, screenWidth, mappingSelectorDividerY, dividerColor);
 
-		DrawKey(keySetX + 0*keyBoxJump, keySetY, Glyph.A, keyColors[0], Controller.CurrentKeymap.HasFlag(KeymapUtil.Keymap.A));
-		DrawKey(keySetX + 1*keyBoxJump, keySetY, Glyph.S, keyColors[1], Controller.CurrentKeymap.HasFlag(KeymapUtil.Keymap.S));
-		DrawKey(keySetX + 2*keyBoxJump, keySetY, Glyph.D, keyColors[2], Controller.CurrentKeymap.HasFlag(KeymapUtil.Keymap.D));
-		DrawKey(keySetX + 3*keyBoxJump, keySetY, Glyph.F, keyColors[3], Controller.CurrentKeymap.HasFlag(KeymapUtil.Keymap.F));
+		DrawKey(0, keySetX + 0*keyBoxJump, keySetY, Glyph.A, Controller.CurrentKeymap.HasFlag(KeymapUtil.Keymap.A));
+		DrawKey(1, keySetX + 1*keyBoxJump, keySetY, Glyph.S, Controller.CurrentKeymap.HasFlag(KeymapUtil.Keymap.S));
+		DrawKey(2, keySetX + 2*keyBoxJump, keySetY, Glyph.D, Controller.CurrentKeymap.HasFlag(KeymapUtil.Keymap.D));
+		DrawKey(3, keySetX + 3*keyBoxJump, keySetY, Glyph.F, Controller.CurrentKeymap.HasFlag(KeymapUtil.Keymap.F));
 		// one key-sized gap here to split ASDF from JKL;
-		DrawKey(keySetX + 5*keyBoxJump, keySetY, Glyph.J, keyColors[4], Controller.CurrentKeymap.HasFlag(KeymapUtil.Keymap.Up));
-		DrawKey(keySetX + 6*keyBoxJump, keySetY, Glyph.K, keyColors[5], Controller.CurrentKeymap.HasFlag(KeymapUtil.Keymap.Down));
-		DrawKey(keySetX + 7*keyBoxJump, keySetY, Glyph.L, keyColors[6], Controller.CurrentKeymap.HasFlag(KeymapUtil.Keymap.Sharp));
-		DrawKey(keySetX + 8*keyBoxJump, keySetY, Glyph.Semicolon, keyColors[7], Controller.CurrentKeymap.HasFlag(KeymapUtil.Keymap.Flat));
+		DrawKey(4, keySetX + 5*keyBoxJump, keySetY, Glyph.J, Controller.CurrentKeymap.HasFlag(KeymapUtil.Keymap.Up));
+		DrawKey(5, keySetX + 6*keyBoxJump, keySetY, Glyph.K, Controller.CurrentKeymap.HasFlag(KeymapUtil.Keymap.Down));
+		DrawKey(6, keySetX + 7*keyBoxJump, keySetY, Glyph.L, Controller.CurrentKeymap.HasFlag(KeymapUtil.Keymap.Sharp));
+		DrawKey(7, keySetX + 8*keyBoxJump, keySetY, Glyph.Semicolon, Controller.CurrentKeymap.HasFlag(KeymapUtil.Keymap.Flat));
 
 		DrawSpace(keySetX, spacebarY, Controller.CurrentKeymap.HasFlag(KeymapUtil.Keymap.ApplyOctave));
 	}
 
-	void DrawKey(int x, int y, Glyph glyph, Color tint, bool pressed)
+	void DrawKey(int index, int x, int y, Glyph glyph, bool pressed)
 	{
+		// todo: use index to do everything in here without requiring any other parameters
 		int yOffset = pressed? keyPressedSink : 0;
 
 		// todo: draw all boxes first to allow for proper batching
 		BeginShaderMode(roundedSquareShader);
-		DrawRectangleUV(new(x, y + yOffset, keyBoxWidth, keyBoxHeight), pressed? Color.Lerp(tint, backgroundColor, 0.5f) : tint);
+		DrawRectangleUV(new(x, y + yOffset, keyBoxWidth, keyBoxHeight), pressed? keyPressedColors[index] : keyColor);
 		EndShaderMode();
 
 		DrawGlyph(x, y + yOffset, glyph, backgroundColor);
@@ -257,7 +259,7 @@ class Renderer : Singleton<Renderer>
 	void DrawSpace(int x, int y, bool pressed)
 	{
 		int yOffset = pressed? keyPressedSink : 0;
-		Color currentKeyColor = pressed? Color.Lerp(keyColors[8], backgroundColor, 0.5f) : keyColors[8];
+		Color currentKeyColor = pressed? Color.Lerp(keyColor, backgroundColor, 0.5f) : keyColor;
 		DrawOutlinedBox(x, y + yOffset, spacebarWidth, keyBoxHeight, currentKeyColor, 1, backgroundColor);
 
 		const int spacebarGlyphMarginX = 20;
