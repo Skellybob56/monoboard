@@ -214,7 +214,7 @@ class Renderer : Singleton<Renderer>
 
 	static void DrawRectangleUV(Rectangle rec, Color tint)
 	{
-		Rlgl.Begin(7); // quad mode
+		Rlgl.Begin(DrawMode.Quads);
 		{
 			// set color and normal
 			Rlgl.Color4f(tint.R/255f, tint.G/255f, tint.B/255f, tint.A/255f);

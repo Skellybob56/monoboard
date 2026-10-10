@@ -27,7 +27,7 @@ class Instrument : Singleton<Instrument>
 
 			field = value;
 		}
-	}
+	} = 0;
 
 	public static int BaseOctave { get; private set; } = 4;
 	public static int OctaveShift { get; private set; } = 0;
@@ -44,7 +44,6 @@ class Instrument : Singleton<Instrument>
 	{
 		this.midiManager = midiManager;
 
-		RootTone = 0;
 		(combinations, scale) = FileReader.GetCombinationsAndScale("Major");
 	}
 
