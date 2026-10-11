@@ -47,7 +47,7 @@ class Renderer : Singleton<Renderer>
 	static readonly ImmutableArray<Color> keyPressedColors = [
 		new(144,  58,  59), new( 59,  87, 115), new( 56,  92,  73), new(166, 109,  56), // ASDF
 		new(117, 114,  98), new(117, 114,  98), new(111, 118, 119), new(111, 118, 119), // JKL;
-		Color.Gray
+		new(117, 114,  98)
 	];
 
 	const float roundedBoxRadius = 0.3125f;
@@ -265,21 +265,17 @@ class Renderer : Singleton<Renderer>
 	void DrawSpace(int x, int y, bool pressed)
 	{
 		int yOffset = pressed? keyPressedSink : 0;
-		Color currentKeyColor = pressed? Color.Lerp(keyColor, backgroundColor, 0.5f) : keyColor;
-		DrawOutlinedBox(x, y + yOffset, spacebarWidth, keyBoxHeight, currentKeyColor, 1, backgroundColor);
+		Color currentKeyColor = pressed? keyPressedColors[8] : keyColor;
+
+		DrawRoundedRectangle(new(x, y + yOffset, spacebarWidth, keyBoxHeight), currentKeyColor, roundedBoxRadius);
 
 		const int spacebarGlyphMarginX = 20;
 		const int spacebarGlyphMarginY = 16;
 		const int spacebarGlyphWidth = spacebarWidth - (2*spacebarGlyphMarginX);
 		const int spacebarGlyphHeight = 18;
-		DrawRectangle(x + spacebarGlyphMarginX, y + yOffset + spacebarGlyphMarginY, spacebarGlyphWidth, spacebarGlyphHeight, currentKeyColor);
-		DrawRectangle(x + spacebarGlyphMarginX + 1, y + yOffset + spacebarGlyphMarginY, spacebarGlyphWidth-2, spacebarGlyphHeight-1, backgroundColor);
-	}
-
-	static void DrawOutlinedBox(int x, int y, int width, int height, Color outlineColor, int outlineThickness, Color fillColor)
-	{
-		DrawRectangle(x, y, width, height, outlineColor);
-		DrawRectangle(x + outlineThickness, y + outlineThickness, width-(2*outlineThickness), height-(2*outlineThickness), fillColor);
+		// todo: make this a thick, rounded shape
+		DrawRectangle(x + spacebarGlyphMarginX, y + yOffset + spacebarGlyphMarginY, spacebarGlyphWidth, spacebarGlyphHeight, backgroundColor);
+		DrawRectangle(x + spacebarGlyphMarginX + 1, y + yOffset + spacebarGlyphMarginY, spacebarGlyphWidth-2, spacebarGlyphHeight-1, currentKeyColor);
 	}
 
 	enum Glyph : byte
