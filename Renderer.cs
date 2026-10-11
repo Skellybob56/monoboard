@@ -50,6 +50,8 @@ class Renderer : Singleton<Renderer>
 		Color.Gray
 	];
 
+	const float roundedBoxRadius = 0.3125f;
+
 	const int defaultMargin = 12;
 
 	const int noteLineWindowWidth = 64;
@@ -89,7 +91,7 @@ class Renderer : Singleton<Renderer>
 	public const int screenHeight = spacebarY + keyBoxHeight + defaultMargin;
 
 	// todo: vary glsl version by platform (330 for PC, 100 for android and web)
-	static Shader roundedSquareShader = LoadShader(null, "assets/shaders/rounded_box.fs");
+	static Shader roundedSquareShader = LoadShader("assets/shaders/rounded_box.vs", "assets/shaders/rounded_box.fs");
 
 	public void Render()
 	{
@@ -205,35 +207,39 @@ class Renderer : Singleton<Renderer>
 		int yOffset = pressed? keyPressedSink : 0;
 
 		// todo: draw all boxes first to allow for proper batching
-		BeginShaderMode(roundedSquareShader);
-		DrawRectangleUV(new(x, y + yOffset, keyBoxWidth, keyBoxHeight), pressed? keyPressedColors[index] : keyColor);
-		EndShaderMode();
+		DrawRoundedRectangle(new(x, y + yOffset, keyBoxWidth, keyBoxHeight), pressed? keyPressedColors[index] : keyColor, roundedBoxRadius);
 
 		DrawGlyph(x, y + yOffset, glyph, backgroundColor);
 	}
 
-	static void DrawRectangleUV(Rectangle rec, Color tint)
+	// todo: use a buffered system to reduce draw calls
+	static void DrawRoundedRectangle(Rectangle rec, Color tint, float radius)
 	{
+		// todo: implement window resizing and clean everything like this up
+		Vector2 recRadii = rec.Size/(2f * keyBoxWidth); // all rounded rectangle values are relative to keyBoxWidth
+
+		BeginShaderMode(roundedSquareShader);
 		Rlgl.Begin(DrawMode.Quads);
 		{
 			// set color and normal
 			Rlgl.Color4f(tint.R/255f, tint.G/255f, tint.B/255f, tint.A/255f);
-			Rlgl.Normal3f(0f, 0f, 1f);
+			Rlgl.Normal3f(recRadii.X - radius, recRadii.Y - radius, radius);
 
 			// define all four vertices
-			Rlgl.TexCoord2f(0f, 0f); // top left
+			Rlgl.TexCoord2f(-recRadii.X, -recRadii.Y); // top left
 			Rlgl.Vertex2f(rec.Position.X, rec.Position.Y);
 
-			Rlgl.TexCoord2f(0f, 1f); // bottom left
+			Rlgl.TexCoord2f(-recRadii.X, +recRadii.Y); // bottom left
 			Rlgl.Vertex2f(rec.Position.X, rec.Position.Y + rec.Size.Y);
 
-			Rlgl.TexCoord2f(1f, 1f); // bottom right
+			Rlgl.TexCoord2f(+recRadii.X, +recRadii.Y); // bottom right
 			Rlgl.Vertex2f(rec.Position.X + rec.Size.X, rec.Position.Y + rec.Size.Y);
 
-			Rlgl.TexCoord2f(1f, 0f); // top right
+			Rlgl.TexCoord2f(+recRadii.X, -recRadii.Y); // top right
 			Rlgl.Vertex2f(rec.Position.X + rec.Size.X, rec.Position.Y);
 		}
 		Rlgl.End();
+		EndShaderMode();
 	}
 
 	void DrawGlyph(int x, int y, Glyph glyph, Color color)

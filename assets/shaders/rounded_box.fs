@@ -3,9 +3,7 @@
 // Input vertex attributes (from vertex shader)
 in vec2 fragTexCoord;
 in vec4 fragColor;
-
-// Input uniform values
-uniform vec4 colDiffuse;
+in vec3 fragNormal;
 
 // Output fragment color
 out vec4 finalColor;
@@ -14,19 +12,16 @@ out vec4 finalColor;
 
 void main()
 {
-	#define radius 0.3125
-	#define boxRadius .5
+	// make this a uniform
 	#define pixelsPerUnit 56.
 
-	vec4 color = colDiffuse*fragColor;
+	float radius = fragNormal.z;
 
-	vec2 uv = fragTexCoord - vec2(0.5, 0.5);
+	vec2 solidBoxCorner = fragNormal.xy;
+	float partialSdf = distance(max(abs(fragTexCoord), solidBoxCorner), solidBoxCorner) - radius;
 
-	vec2 solidBoxCorner = vec2(boxRadius - radius);
-	float partialSdf = distance(max(abs(uv), solidBoxCorner), solidBoxCorner) - radius;
-
-	float roundedBox = clamp(partialSdf * (-pixelsPerUnit), 0., 1.);
+	float roundedBox = clamp(partialSdf * (-pixelsPerUnit) + 0.5, 0., 1.);
 
 	// Calculate final fragment color
-	finalColor = vec4(color.rgb, color.a * roundedBox);
+	finalColor = vec4(fragColor.rgb, fragColor.a * roundedBox);
 }
