@@ -50,7 +50,7 @@ class Renderer : Singleton<Renderer>
 		new(117, 114,  98)
 	];
 
-	const float roundedBoxRadius = 0.3125f;
+	const float roundedBoxRadius = 17.5f;
 
 	const int defaultMargin = 12;
 
@@ -212,11 +212,12 @@ class Renderer : Singleton<Renderer>
 		DrawGlyph(x, y + yOffset, glyph, backgroundColor);
 	}
 
+	// todo: lots of cleaning required!!!
 	// todo: use a buffered system to reduce draw calls
 	static void DrawRoundedRectangle(Rectangle rec, Color tint, float radius)
 	{
 		// todo: implement window resizing and clean everything like this up
-		Vector2 recRadii = rec.Size/(2f * keyBoxWidth); // all rounded rectangle values are relative to keyBoxWidth
+		Vector2 recRadii = rec.Size/2f;
 
 		BeginShaderMode(roundedSquareShader);
 		Rlgl.Begin(DrawMode.Quads);
