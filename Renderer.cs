@@ -247,6 +247,37 @@ class Renderer : Singleton<Renderer>
 		EndShaderMode();
 	}
 
+	// todo: use a buffered system to reduce draw calls
+	static void DrawRoundedBaseRectangle(Rectangle rec, Color tint, float radius)
+	{
+		Vector2 recRadii = new(rec.Size.X/2f, rec.Size.Y);
+
+		BeginShaderMode(roundedSquareShader);
+		Rlgl.Begin(DrawMode.Quads);
+		{
+			// set color and normal
+			Rlgl.Color4ub(tint.R, tint.G, tint.B, tint.A);
+			Rlgl.Normal3f(recRadii.X - radius, recRadii.Y - radius, radius);
+
+			// todo: ceil the max position and floor the min position to ensure an acceptable size - adjust TexCoords accordingly
+
+			// define all four vertices
+			Rlgl.TexCoord2f(-recRadii.X, 0); // top left
+			Rlgl.Vertex2f(rec.Position.X, rec.Position.Y);
+
+			Rlgl.TexCoord2f(-recRadii.X, +recRadii.Y); // bottom left
+			Rlgl.Vertex2f(rec.Position.X, rec.Position.Y + rec.Size.Y);
+
+			Rlgl.TexCoord2f(+recRadii.X, +recRadii.Y); // bottom right
+			Rlgl.Vertex2f(rec.Position.X + rec.Size.X, rec.Position.Y + rec.Size.Y);
+
+			Rlgl.TexCoord2f(+recRadii.X, 0); // top right
+			Rlgl.Vertex2f(rec.Position.X + rec.Size.X, rec.Position.Y);
+		}
+		Rlgl.End();
+		EndShaderMode();
+	}
+
 	void DrawGlyph(int x, int y, Glyph glyph, Color color)
 	{
 		char character = GlyphToChar(glyph);
@@ -274,13 +305,20 @@ class Renderer : Singleton<Renderer>
 
 		DrawRoundedRectangle(new(x, y + yOffset, spacebarWidth, keyBoxHeight), currentKeyColor, roundedBoxRadius);
 
-		const int spacebarGlyphMarginX = 20;
-		const int spacebarGlyphMarginY = 16;
+		const int spacebarGlyphMarginX = 22;
+		const int spacebarGlyphMarginY = 22;
 		const int spacebarGlyphWidth = spacebarWidth - (2*spacebarGlyphMarginX);
-		const int spacebarGlyphHeight = 18;
-		// todo: make this a thick, rounded shape
-		DrawRectangle(x + spacebarGlyphMarginX, y + yOffset + spacebarGlyphMarginY, spacebarGlyphWidth, spacebarGlyphHeight, backgroundColor);
-		DrawRectangle(x + spacebarGlyphMarginX + 4, y + yOffset + spacebarGlyphMarginY, spacebarGlyphWidth-8, spacebarGlyphHeight-4, currentKeyColor);
+		const int spacebarGlyphHeight = 20;
+		const int spacebarGlyphThickness = 4;
+		const int spacebarGlyphRadius = 12;
+
+		DrawRoundedBaseRectangle(
+			new(x + spacebarGlyphMarginX, y + yOffset + spacebarGlyphMarginY, spacebarGlyphWidth, spacebarGlyphHeight),
+			backgroundColor, spacebarGlyphRadius);
+
+		DrawRoundedBaseRectangle(
+			new(x + spacebarGlyphMarginX + spacebarGlyphThickness, y + yOffset + spacebarGlyphMarginY, spacebarGlyphWidth - 2*spacebarGlyphThickness, spacebarGlyphHeight - spacebarGlyphThickness),
+			currentKeyColor, spacebarGlyphRadius - spacebarGlyphThickness);
 	}
 
 	enum Glyph : byte
