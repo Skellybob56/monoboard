@@ -222,8 +222,10 @@ class Renderer : Singleton<Renderer>
 		Rlgl.Begin(DrawMode.Quads);
 		{
 			// set color and normal
-			Rlgl.Color4f(tint.R/255f, tint.G/255f, tint.B/255f, tint.A/255f);
+			Rlgl.Color4ub(tint.R, tint.G, tint.B, tint.A);
 			Rlgl.Normal3f(recRadii.X - radius, recRadii.Y - radius, radius);
+
+			// todo: ceil the max position and floor the min position to ensure an acceptable size - adjust TexCoords accordingly
 
 			// define all four vertices
 			Rlgl.TexCoord2f(-recRadii.X, -recRadii.Y); // top left
