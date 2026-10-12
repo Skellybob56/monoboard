@@ -83,11 +83,13 @@ class Renderer : Singleton<Renderer>
 	const int keySetX = noteLineWindowWidth + defaultMargin;
 	const int keySetY = mappingSelectorDividerY + defaultMargin;
 	const int keyBoxJump = keyBoxSpacing + keyBoxWidth;
+	const int keySetWidth = keyBoxJump*8 + keyBoxWidth;
 
 	const int spacebarY = keySetY + keyBoxHeight + defaultMargin;
-	const int spacebarWidth = 9*keyBoxWidth + 8*keyBoxSpacing;
+	const int spacebarX = keySetX + keyBoxJump;
+	const int spacebarWidth = 6*keyBoxJump + keyBoxWidth;
 
-	public const int screenWidth = keySetX + spacebarWidth + defaultMargin;
+	public const int screenWidth = keySetX + keySetWidth + defaultMargin;
 	public const int screenHeight = spacebarY + keyBoxHeight + defaultMargin;
 
 	// todo: vary glsl version by platform (330 for PC, 100 for android and web)
@@ -198,7 +200,7 @@ class Renderer : Singleton<Renderer>
 		DrawKey(6, keySetX + 7*keyBoxJump, keySetY, Glyph.L, Controller.CurrentKeymap.HasFlag(KeymapUtil.Keymap.Sharp));
 		DrawKey(7, keySetX + 8*keyBoxJump, keySetY, Glyph.Semicolon, Controller.CurrentKeymap.HasFlag(KeymapUtil.Keymap.Flat));
 
-		DrawSpace(keySetX, spacebarY, Controller.CurrentKeymap.HasFlag(KeymapUtil.Keymap.ApplyOctave));
+		DrawSpace(spacebarX, spacebarY, Controller.CurrentKeymap.HasFlag(KeymapUtil.Keymap.ApplyOctave));
 	}
 
 	void DrawKey(int index, int x, int y, Glyph glyph, bool pressed)
@@ -278,7 +280,7 @@ class Renderer : Singleton<Renderer>
 		const int spacebarGlyphHeight = 18;
 		// todo: make this a thick, rounded shape
 		DrawRectangle(x + spacebarGlyphMarginX, y + yOffset + spacebarGlyphMarginY, spacebarGlyphWidth, spacebarGlyphHeight, backgroundColor);
-		DrawRectangle(x + spacebarGlyphMarginX + 1, y + yOffset + spacebarGlyphMarginY, spacebarGlyphWidth-2, spacebarGlyphHeight-1, currentKeyColor);
+		DrawRectangle(x + spacebarGlyphMarginX + 4, y + yOffset + spacebarGlyphMarginY, spacebarGlyphWidth-8, spacebarGlyphHeight-4, currentKeyColor);
 	}
 
 	enum Glyph : byte
