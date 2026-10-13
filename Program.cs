@@ -7,11 +7,6 @@ namespace Monoboard;
 
 class Program : IDisposable
 {
-	[DllImport("winmm.dll")]
-	static extern uint timeBeginPeriod(uint uPeriod);
-	[DllImport("winmm.dll")]
-	static extern uint timeEndPeriod(uint uPeriod);
-
 	readonly Controller controller;
 	readonly MidiManager midiManager;
 	readonly Instrument instrument;
@@ -45,7 +40,6 @@ class Program : IDisposable
 		SetWindowIcon(logo);
 		UnloadImage(logo);
 
-		timeBeginPeriod(1);
 		while (!WindowShouldClose())
 		{
 			controller.UpdateKeymap();
@@ -67,8 +61,6 @@ class Program : IDisposable
 
 	public void Dispose()
 	{
-		timeEndPeriod(1);
-
 		renderer.Dispose();
 		instrument.Dispose();
 		midiManager.Dispose();
