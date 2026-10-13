@@ -17,7 +17,7 @@ class MidiPortHandler : IDisposable
 
 	public void Dispose()
 	{
-		if (PortIsNull) { throw new InvalidOperationException($"{nameof(LpvmMidiPort)} is a null pointer."); }
+		if (PortIsNull) { return; }
 		
 		TEVirtualMidi.virtualMIDIClosePort(LpvmMidiPort);
 		LpvmMidiPort = nint.Zero;
