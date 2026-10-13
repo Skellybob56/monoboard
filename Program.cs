@@ -5,21 +5,21 @@ using static Monoboard.KeymapUtil;
 
 namespace Monoboard;
 
-internal static class Program
+class Program
 {
 	[DllImport("winmm.dll")]
 	static extern uint timeBeginPeriod(uint uPeriod);
 	[DllImport("winmm.dll")]
 	static extern uint timeEndPeriod(uint uPeriod);
 
-	static Controller controller;
-	static MidiManager midiManager;
-	static Instrument instrument;
-	static Renderer renderer;
+	Controller controller;
+	MidiManager midiManager;
+	Instrument instrument;
+	Renderer renderer;
 
 	static bool updateGraphics = false;
 
-	static void Init()
+	private Program()
 	{
 		InitWindow(Renderer.screenWidth, Renderer.screenHeight, "Monoboard");
 		SetExitKey(KeyboardKey.Null);
@@ -37,10 +37,10 @@ internal static class Program
 
 	// STAThread is required if you deploy using NativeAOT on Windows - See https://github.com/raylib-cs/raylib-cs/issues/301
 	[System.STAThread]
-	public static void Main()
-	{
-		Init();
+	public static void Main() => new Program().Start();
 
+	void Start()
+	{
 		Image logo = LoadImage("assets/logo.png");
 		SetWindowIcon(logo);
 		UnloadImage(logo);
@@ -60,14 +60,14 @@ internal static class Program
 		}
 		timeEndPeriod(1);
 
-		CloseWindow();
-		Controller.Destroy();
-		MidiManager.Destroy();
-		Instrument.Destroy();
 		Renderer.Destroy();
+		Instrument.Destroy();
+		MidiManager.Destroy();
+		Controller.Destroy();
+		CloseWindow();
 	}
 
-	public static void ScheduleGraphicalUpdate()
+	static public void ScheduleGraphicalUpdate()
 	{
 		updateGraphics = true;
 	}
