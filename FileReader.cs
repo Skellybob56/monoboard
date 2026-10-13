@@ -18,7 +18,7 @@ static class FileReader
 			if (fileName.EndsWith(patternExtension))
 			{
 				// todo: consider pruning invalid names (e.g. bad whitespace)
-				patternNames.Add(fileName[..^patternExtension.Length]);
+				patternNames.Add(fileName[(fileName.LastIndexOf('/') + 1)..^patternExtension.Length]);
 			}
 		}
 
