@@ -202,7 +202,6 @@ class Renderer() : Singleton<Renderer>
 		DrawGlyph(x, y + yOffset, glyph, backgroundColor);
 	}
 
-	// todo: lots of cleaning required!!!
 	// todo: use a buffered system to reduce draw calls
 	static void DrawRoundedRectangle(Rectangle rec, Color tint, float radius)
 	{
@@ -210,60 +209,58 @@ class Renderer() : Singleton<Renderer>
 		Vector2 recRadii = rec.Size/2f;
 
 		BeginShaderMode(roundedSquareShader);
-		Rlgl.Begin(DrawMode.Quads);
-		{
-			// set color and normal
-			Rlgl.Color4ub(tint.R, tint.G, tint.B, tint.A);
-			Rlgl.Normal3f(recRadii.X - radius, recRadii.Y - radius, radius);
 
-			// todo: ceil the max position and floor the min position to ensure an acceptable size - adjust TexCoords accordingly
+		DrawRectUv(rec,
+			new(-recRadii.X, -recRadii.Y),
+			new(-recRadii.X, +recRadii.Y),
+			new(+recRadii.X, +recRadii.Y),
+			new(+recRadii.X, -recRadii.Y),
+			tint, new(recRadii.X - radius, recRadii.Y - radius, radius));
 
-			// define all four vertices
-			Rlgl.TexCoord2f(-recRadii.X, -recRadii.Y); // top left
-			Rlgl.Vertex2f(rec.Position.X, rec.Position.Y);
-
-			Rlgl.TexCoord2f(-recRadii.X, +recRadii.Y); // bottom left
-			Rlgl.Vertex2f(rec.Position.X, rec.Position.Y + rec.Size.Y);
-
-			Rlgl.TexCoord2f(+recRadii.X, +recRadii.Y); // bottom right
-			Rlgl.Vertex2f(rec.Position.X + rec.Size.X, rec.Position.Y + rec.Size.Y);
-
-			Rlgl.TexCoord2f(+recRadii.X, -recRadii.Y); // top right
-			Rlgl.Vertex2f(rec.Position.X + rec.Size.X, rec.Position.Y);
-		}
-		Rlgl.End();
 		EndShaderMode();
 	}
 
 	// todo: use a buffered system to reduce draw calls
 	static void DrawRoundedBaseRectangle(Rectangle rec, Color tint, float radius)
 	{
-		Vector2 recRadii = new(rec.Size.X/2f, rec.Size.Y);
+		Vector2 recRadii = new(rec.Size.X/2f, rec.Size.Y); // y size is doubled to pretend that the rounded rectangle is twice as large
 
 		BeginShaderMode(roundedSquareShader);
+
+		DrawRectUv(rec,
+			new(-recRadii.X, 0), // normally negative y values are 0 here to split the double-height rectangle in half
+			new(-recRadii.X, +recRadii.Y),
+			new(+recRadii.X, +recRadii.Y),
+			new(+recRadii.X, 0),
+			tint, new(recRadii.X - radius, recRadii.Y - radius, radius));
+
+		EndShaderMode();
+	}
+
+	static void DrawRectUv(Rectangle rec, Vector2 topLeftUv, Vector2 bottomLeftUv, Vector2 bottomRightUv, Vector2 topRightUv, Color tint, Vector3 normal)
+	{
 		Rlgl.Begin(DrawMode.Quads);
 		{
 			// set color and normal
 			Rlgl.Color4ub(tint.R, tint.G, tint.B, tint.A);
-			Rlgl.Normal3f(recRadii.X - radius, recRadii.Y - radius, radius);
+			Rlgl.Normal3f(normal.X, normal.Y, normal.Z);
 
 			// todo: ceil the max position and floor the min position to ensure an acceptable size - adjust TexCoords accordingly
 
 			// define all four vertices
-			Rlgl.TexCoord2f(-recRadii.X, 0); // top left
+			Rlgl.TexCoord2f(topLeftUv.X, topLeftUv.Y); // top left
 			Rlgl.Vertex2f(rec.Position.X, rec.Position.Y);
 
-			Rlgl.TexCoord2f(-recRadii.X, +recRadii.Y); // bottom left
+			Rlgl.TexCoord2f(bottomLeftUv.X, bottomLeftUv.Y); // bottom left
 			Rlgl.Vertex2f(rec.Position.X, rec.Position.Y + rec.Size.Y);
 
-			Rlgl.TexCoord2f(+recRadii.X, +recRadii.Y); // bottom right
+			Rlgl.TexCoord2f(bottomRightUv.X, bottomRightUv.Y); // bottom right
 			Rlgl.Vertex2f(rec.Position.X + rec.Size.X, rec.Position.Y + rec.Size.Y);
 
-			Rlgl.TexCoord2f(+recRadii.X, 0); // top right
+			Rlgl.TexCoord2f(topRightUv.X, topRightUv.Y); // top right
 			Rlgl.Vertex2f(rec.Position.X + rec.Size.X, rec.Position.Y);
 		}
 		Rlgl.End();
-		EndShaderMode();
 	}
 
 	void DrawGlyph(int x, int y, Glyph glyph, Color color)
