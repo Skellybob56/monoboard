@@ -5,33 +5,27 @@ using static Raylib_cs.Raylib;
 
 namespace Monoboard;
 
-class Renderer : Singleton<Renderer>
+class Renderer() : Singleton<Renderer>
 {
 	// fonts
-	readonly Font logoFont;
 	const int logoFontSize = 64;
-	readonly Font keyFont;
+	readonly Font logoFont = LoadFontEx("assets/CooperMdBT-Regular.ttf", logoFontSize,
+		['M', 'O', 'N', 'B', 'A', 'R', 'D'], 7); // MONOBOARD
+
 	const int keyFontSize = 44;
-	readonly Font playingNoteFont;
+	readonly Font keyFont = LoadFontEx("assets/CooperLtBT-Regular.ttf", keyFontSize,
+		['A', 'S', 'D', 'F', 'J', 'K', 'L', ';'], 8);
+
 	const int playingNoteFontSize = 18;
-	readonly Font mappingSelectorFont;
+	readonly Font playingNoteFont = LoadFontEx("assets/AtkinsonHyperlegibleNext-Regular.otf", playingNoteFontSize,
+		['A', 'B', 'C', 'D', 'E', 'F', 'G', '#', 'b',
+		 '-', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'], 20);
+
 	const int mappingSelectorFontSize = 24;
+	readonly Font mappingSelectorFont = LoadFontEx("assets/AtkinsonHyperlegibleNext-Regular.otf", mappingSelectorFontSize,
+		['-', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'], 11);
 
-	public Renderer()
-	{
-		logoFont = LoadFontEx("assets/CooperMdBT-Regular.ttf", logoFontSize,
-			['M', 'O', 'N', 'B', 'A', 'R', 'D'], 7); // MONOBOARD
-
-		keyFont = LoadFontEx("assets/CooperLtBT-Regular.ttf", keyFontSize,
-			['A', 'S', 'D', 'F', 'J', 'K', 'L', ';'], 8);
-
-		playingNoteFont = LoadFontEx("assets/AtkinsonHyperlegibleNext-Regular.otf", playingNoteFontSize,
-			['A', 'B', 'C', 'D', 'E', 'F', 'G', '#', 'b',
-			 '-', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'], 20);
-
-		mappingSelectorFont = LoadFontEx("assets/AtkinsonHyperlegibleNext-Regular.otf", mappingSelectorFontSize,
-			['-', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'], 11);
-	}
+	static Shader roundedSquareShader = LoadShader("assets/shaders/rounded_box.vs", "assets/shaders/rounded_box.fs");
 
 	// inputs
 	static readonly Color backgroundColor = new(40, 32, 32);
@@ -88,9 +82,6 @@ class Renderer : Singleton<Renderer>
 
 	public const int screenWidth = keySetX + keySetWidth + defaultMargin;
 	public const int screenHeight = spacebarY + keyBoxHeight + defaultMargin;
-
-	// todo: vary glsl version by platform (330 for PC, 100 for android and web)
-	static Shader roundedSquareShader = LoadShader("assets/shaders/rounded_box.vs", "assets/shaders/rounded_box.fs");
 
 	public void Render()
 	{
