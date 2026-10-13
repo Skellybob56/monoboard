@@ -8,11 +8,10 @@ class Controller() : Singleton<Controller>
 {
 	public static bool MirrorMode { get; private set; } = false;
 	public static Keymap CurrentKeymap { get; private set; } = Keymap.None;
-	static Keymap differenceKeymap = Keymap.None;
 
 	public void UpdateKeymap()
 	{
-		differenceKeymap = CurrentKeymap;
+		Keymap differenceKeymap = CurrentKeymap;
 		CurrentKeymap = Keymap.None;
 
 		if (IsKeyDown(KeyboardKey.A)) { CurrentKeymap |= MirrorMode? Keymap.Flat : Keymap.A; }
