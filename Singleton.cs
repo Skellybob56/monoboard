@@ -1,28 +1,22 @@
 ﻿namespace Monoboard;
 
-public abstract class Singleton<T> where T : Singleton<T>
+public abstract class Singleton<T> : IDisposable where T : Singleton<T>
 {
-	private static T? Instance;
+	private static T? Instance = null;
 
-	protected static T Register(T newInstance)
+	protected Singleton()
 	{
-		if (Instance != null)
-		{
-			throw new InvalidOperationException($"{typeof(T).Name} instance already exists.");
-		}
-		Instance = newInstance;
-		return Instance;
+		if (Instance is not null)
+		{ throw new InvalidOperationException($"{typeof(T).Name} instance already exists."); }
+		Instance = (T)this;
 	}
 
-	public static void Destroy()
+	public void Dispose()
 	{
-		if (Instance == null)
-		{
-			throw new InvalidOperationException($"{typeof(T).Name} instance doesn't exist.");
-		}
-		Instance.Dispose();
+		if (!ReferenceEquals(this, Instance)) { return; }
 		Instance = null;
+		OnDisposal();
 	}
 
-	protected virtual void Dispose() { }
+	protected virtual void OnDisposal() { }
 }

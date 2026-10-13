@@ -3,21 +3,15 @@ using TEVirtualMidiBindingsCs;
 
 namespace Monoboard;
 
-class MidiManager : Singleton<MidiManager>
+class MidiManager() : Singleton<MidiManager>
 {
-	public static MidiManager Create()
-	{ return Register(new MidiManager()); }
+	MidiPortHandler midiPortHandler = new(midiDeviceName);
 
 	const string midiDeviceName = "monoboard";
 	const byte noteVelocity = 80; // limited to a 7 bit integer (80 is considered mf in musical volume)
 	static readonly bool startNoteBeforeEndNote = true; // when swapping between two notes, this will start the next note before ending the last which can prevent monophonic clicking
 
 	public static byte? PlayingNote { get; private set; } = null;
-
-	private MidiManager()
-	{
-		MidiPortHandler.Initialize(midiDeviceName);
-	}
 
 	// returns false when the note it out of midi range
 	public bool NoteEvent((int octave, int note)? noteData)
@@ -41,8 +35,8 @@ class MidiManager : Singleton<MidiManager>
 
 		if (PlayingNote == newNote) { return; } // note is already playing
 
-		void SendOff() { if (PlayingNote is not null) TEVirtualMidi.virtualMIDISendData(MidiPortHandler.LpvmMidiPort, [0x80, PlayingNote.Value, 0x00], 3); }
-		void SendOn() { TEVirtualMidi.virtualMIDISendData(MidiPortHandler.LpvmMidiPort, [0x90, newNote, noteVelocity], 3); }
+		void SendOff() { if (PlayingNote is not null) TEVirtualMidi.virtualMIDISendData(midiPortHandler.LpvmMidiPort, [0x80, PlayingNote.Value, 0x00], 3); }
+		void SendOn() { TEVirtualMidi.virtualMIDISendData(midiPortHandler.LpvmMidiPort, [0x90, newNote, noteVelocity], 3); }
 
 		if (startNoteBeforeEndNote) { SendOn(); SendOff(); } else { SendOff(); SendOn(); }
 
@@ -54,12 +48,12 @@ class MidiManager : Singleton<MidiManager>
 		if (PlayingNote is null)
 		{ return; } // attempted to stop playing a note while no note was playing
 
-		TEVirtualMidi.virtualMIDISendData(MidiPortHandler.LpvmMidiPort, [0x80, PlayingNote.Value, 0x00], 3);
+		TEVirtualMidi.virtualMIDISendData(midiPortHandler.LpvmMidiPort, [0x80, PlayingNote.Value, 0x00], 3);
 		PlayingNote = null;
 	}
 
-	protected override void Dispose()
+	protected override void OnDisposal()
 	{
-		MidiPortHandler.Dispose();
+		midiPortHandler.Dispose();
 	}
 }

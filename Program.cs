@@ -5,17 +5,17 @@ using static Monoboard.KeymapUtil;
 
 namespace Monoboard;
 
-class Program
+class Program : IDisposable
 {
 	[DllImport("winmm.dll")]
 	static extern uint timeBeginPeriod(uint uPeriod);
 	[DllImport("winmm.dll")]
 	static extern uint timeEndPeriod(uint uPeriod);
 
-	Controller controller;
-	MidiManager midiManager;
-	Instrument instrument;
-	Renderer renderer;
+	readonly Controller controller;
+	readonly MidiManager midiManager;
+	readonly Instrument instrument;
+	readonly Renderer renderer;
 
 	static bool updateGraphics = false;
 
@@ -24,10 +24,10 @@ class Program
 		InitWindow(Renderer.screenWidth, Renderer.screenHeight, "Monoboard");
 		SetExitKey(KeyboardKey.Null);
 
-		controller = Controller.Create();
-		midiManager = MidiManager.Create();
-		instrument = Instrument.Create(midiManager);
-		renderer = Renderer.Create();
+		controller = new();
+		midiManager = new();
+		instrument = new(midiManager);
+		renderer = new();
 
 		// populate the screen buffer
 		BeginDrawing();
@@ -37,9 +37,9 @@ class Program
 
 	// STAThread is required if you deploy using NativeAOT on Windows - See https://github.com/raylib-cs/raylib-cs/issues/301
 	[System.STAThread]
-	public static void Main() => new Program().Start();
+	public static void Main() { using Program p = new(); p.Run(); }
 
-	void Start()
+	void Run()
 	{
 		Image logo = LoadImage("assets/logo.png");
 		SetWindowIcon(logo);
@@ -58,17 +58,22 @@ class Program
 			{ BeginDrawing(); renderer.Render(); EndDrawing(); updateGraphics = false; } // EndDrawing handles PollInputEvents
 			else { PollInputEvents(); }
 		}
-		timeEndPeriod(1);
-
-		Renderer.Destroy();
-		Instrument.Destroy();
-		MidiManager.Destroy();
-		Controller.Destroy();
-		CloseWindow();
 	}
 
 	static public void ScheduleGraphicalUpdate()
 	{
 		updateGraphics = true;
+	}
+
+	public void Dispose()
+	{
+		timeEndPeriod(1);
+
+		renderer.Dispose();
+		instrument.Dispose();
+		midiManager.Dispose();
+		controller.Dispose();
+
+		CloseWindow();
 	}
 }

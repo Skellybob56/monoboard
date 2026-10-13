@@ -4,16 +4,11 @@ using static Monoboard.KeymapUtil;
 
 namespace Monoboard;
 
-class Controller : Singleton<Controller>
+class Controller() : Singleton<Controller>
 {
 	public static bool MirrorMode { get; private set; } = false;
 	public static Keymap CurrentKeymap { get; private set; } = Keymap.None;
 	static Keymap differenceKeymap = Keymap.None;
-
-	public static Controller Create()
-	{ return Register(new Controller()); }
-
-	private Controller() { }
 
 	public void UpdateKeymap()
 	{

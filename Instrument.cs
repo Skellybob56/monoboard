@@ -5,9 +5,6 @@ namespace Monoboard;
 
 class Instrument : Singleton<Instrument>
 {
-	public static Instrument Create(MidiManager midiManager)
-	{ return Register(new Instrument(midiManager)); }
-
 	// todo: add a smaller `checkTimeOffset` variant that only applies if there are no note keys pressed in the early window (in other words, check for no note keys pressed before the check time and start the rest early if detected)
 	const double checkTimeOffset = 1d / 32d; // in seconds
 
@@ -40,7 +37,7 @@ class Instrument : Singleton<Instrument>
 	Keymap[] combinations;
 	sbyte[] scale;
 
-	private Instrument(MidiManager midiManager)
+	public Instrument(MidiManager midiManager)
 	{
 		this.midiManager = midiManager;
 

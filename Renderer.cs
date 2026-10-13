@@ -7,9 +7,6 @@ namespace Monoboard;
 
 class Renderer : Singleton<Renderer>
 {
-	public static Renderer Create()
-	{ return Register(new Renderer()); }
-
 	// fonts
 	readonly Font logoFont;
 	const int logoFontSize = 64;
@@ -20,7 +17,7 @@ class Renderer : Singleton<Renderer>
 	readonly Font mappingSelectorFont;
 	const int mappingSelectorFontSize = 24;
 
-	private Renderer()
+	public Renderer()
 	{
 		logoFont = LoadFontEx("assets/CooperMdBT-Regular.ttf", logoFontSize,
 			['M', 'O', 'N', 'B', 'A', 'R', 'D'], 7); // MONOBOARD
