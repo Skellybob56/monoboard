@@ -21,7 +21,8 @@ class MidiManager() : Singleton<MidiManager>
 		if (noteData is null)
 		{ NoteOffEvent(); return true; } // null noteData is a rest
 
-		int newNoteInt = noteData.Value.octave * 12 + noteData.Value.note;
+		// add 1 to the octave because midi 0 is actually C-1 rather than C0
+		int newNoteInt = (noteData.Value.octave + 1) * 12 + noteData.Value.note;
 		if (newNoteInt < 0x00 || newNoteInt > 0x7f)
 		{ NoteOffEvent(); return false; } // note out of range: treat as a rest and fail
 
