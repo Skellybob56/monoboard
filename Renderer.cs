@@ -26,7 +26,7 @@ class Renderer() : Singleton<Renderer>
 	readonly Font mappingSelectorFont = LoadFontEx("assets/AtkinsonHyperlegibleNext-Regular.otf", mappingSelectorFontSize,
 		['-', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'], 11);
 
-	static Shader roundedSquareShader = LoadShader("assets/shaders/rounded_box.vs", "assets/shaders/rounded_box.fs");
+	static Shader roundedBoxShader = LoadShader("assets/shaders/rounded_box.vs", "assets/shaders/rounded_box.fs");
 
 	// inputs
 	static readonly Color backgroundColor = new(40, 32, 32);
@@ -161,7 +161,7 @@ class Renderer() : Singleton<Renderer>
 				],
 				5, backgroundColor);
 
-			const string noteDisplay = "C C#D D#E F F#G G#A A#B "; // todo: this system needs to be expanded to use flats and maybe even double sharps and flats to best notate the scale. it will also need to be unified with the scale 
+			const string noteDisplay = "C C#D D#E F F#G G#A A#B "; // todo: this system needs to be expanded to use flats and maybe even double sharps and flats to best notate the scale. it will also need to be unified with the scale
 			DrawTextEx(playingNoteFont, noteDisplay.Substring(playingNote%12 * 2, 2),
 				new(defaultMargin + playingNoteArrowWidth, playingNoteY - playingNoteFontSize/2 + noteTextOffsetY),
 				playingNoteFontSize, 0, playingNoteColor);
@@ -180,12 +180,19 @@ class Renderer() : Singleton<Renderer>
 
 		DrawLine(noteLineWindowWidth, mappingSelectorDividerY, screenWidth, mappingSelectorDividerY, dividerColor);
 
-		DrawKeys();
+		BeginShaderMode(roundedBoxShader);
+		{
+			DrawSpace(spacebarX, spacebarY, Controller.CurrentKeymap.HasFlag(Keymap.ApplyOctave)); // draw space first to batch it with the key boxes (which are drawn before the glyphs)
 
-		DrawSpace(spacebarX, spacebarY, Controller.CurrentKeymap.HasFlag(Keymap.ApplyOctave));
+			DrawKeyBoxes();
+		}
+
+		EndShaderMode();
+
+		DrawKeyGlyphs();
 	}
 
-	void DrawKeys()
+	void DrawKeyBoxes()
 	{
 		for (int i = 0; i < 8; i++)
 		{
@@ -195,20 +202,29 @@ class Renderer() : Singleton<Renderer>
 
 			int yOffset = pressed? keyPressedSink : 0;
 
-			// todo: draw all boxes first to allow for proper batching
 			DrawRoundedRectangle(new(x, keySetY + yOffset, keyBoxWidth, keyBoxHeight), pressed? keyPressedColors[i] : keyColor, roundedBoxRadius);
+		}
+	}
+
+	void DrawKeyGlyphs()
+	{
+		for (int i = 0; i < 8; i++)
+		{
+			bool pressed = Controller.CurrentKeymap.HasFlag(keymapNoteModiferKeys[i]);
+			int slot = i >= 4 ? i + 1 : i; // skip the 5th slot to split ASDF from JKL;
+			int x = keySetX + slot * keyBoxJump;
+
+			int yOffset = pressed? keyPressedSink : 0;
 
 			DrawGlyph(x, keySetY + yOffset, (Glyph)i, backgroundColor);
 		}
 	}
 
-	// todo: use a buffered system to reduce draw calls
+	// caller must BeginShaderMode(roundedSquareShader)
 	static void DrawRoundedRectangle(Rectangle rec, Color tint, float radius)
 	{
 		// todo: implement window resizing and clean everything like this up
 		Vector2 recRadii = rec.Size/2f;
-
-		BeginShaderMode(roundedSquareShader);
 
 		DrawRectUv(rec,
 			new(-recRadii.X, -recRadii.Y),
@@ -216,16 +232,12 @@ class Renderer() : Singleton<Renderer>
 			new(+recRadii.X, +recRadii.Y),
 			new(+recRadii.X, -recRadii.Y),
 			tint, new(recRadii.X - radius, recRadii.Y - radius, radius));
-
-		EndShaderMode();
 	}
 
-	// todo: use a buffered system to reduce draw calls
+	// caller must BeginShaderMode(roundedSquareShader)
 	static void DrawRoundedBaseRectangle(Rectangle rec, Color tint, float radius)
 	{
 		Vector2 recRadii = new(rec.Size.X/2f, rec.Size.Y); // y size is doubled to pretend that the rounded rectangle is twice as large
-
-		BeginShaderMode(roundedSquareShader);
 
 		DrawRectUv(rec,
 			new(-recRadii.X, 0), // normally negative y values are 0 here to split the double-height rectangle in half
@@ -233,8 +245,6 @@ class Renderer() : Singleton<Renderer>
 			new(+recRadii.X, +recRadii.Y),
 			new(+recRadii.X, 0),
 			tint, new(recRadii.X - radius, recRadii.Y - radius, radius));
-
-		EndShaderMode();
 	}
 
 	static void DrawRectUv(Rectangle rec, Vector2 topLeftUv, Vector2 bottomLeftUv, Vector2 bottomRightUv, Vector2 topRightUv, Color tint, Vector3 normal)
