@@ -137,7 +137,8 @@ class Renderer() : Singleton<Renderer>
 			const int playingNoteOutlineThickness = 1;
 			const int noteTextOffsetY = 1;
 
-			int playingNoteY = octaveSeparator4Y - (int)MathF.Round((playingNote - (Instrument.BaseOctave-1)*12 - Instrument.RootTone) * octaveHeight/12f);
+			int rootNote = Instrument.BaseOctave*12 + Instrument.RootTone;
+			int playingNoteY = octaveSeparator4Y - (int)MathF.Round((playingNote - rootNote) * octaveHeight/12f);
 
 			// todo: replace aliased solution with AA shader
 			DrawTriangleFan(
