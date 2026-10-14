@@ -2,6 +2,7 @@ using System.Collections.Immutable;
 using System.Numerics;
 using Raylib_cs;
 using static Raylib_cs.Raylib;
+using static Monoboard.KeymapUtil;
 
 namespace Monoboard;
 
@@ -179,28 +180,26 @@ class Renderer() : Singleton<Renderer>
 
 		DrawLine(noteLineWindowWidth, mappingSelectorDividerY, screenWidth, mappingSelectorDividerY, dividerColor);
 
-		DrawKey(0, keySetX + 0*keyBoxJump, keySetY, Glyph.A, Controller.CurrentKeymap.HasFlag(KeymapUtil.Keymap.A));
-		DrawKey(1, keySetX + 1*keyBoxJump, keySetY, Glyph.S, Controller.CurrentKeymap.HasFlag(KeymapUtil.Keymap.S));
-		DrawKey(2, keySetX + 2*keyBoxJump, keySetY, Glyph.D, Controller.CurrentKeymap.HasFlag(KeymapUtil.Keymap.D));
-		DrawKey(3, keySetX + 3*keyBoxJump, keySetY, Glyph.F, Controller.CurrentKeymap.HasFlag(KeymapUtil.Keymap.F));
-		// one key-sized gap here to split ASDF from JKL;
-		DrawKey(4, keySetX + 5*keyBoxJump, keySetY, Glyph.J, Controller.CurrentKeymap.HasFlag(KeymapUtil.Keymap.Up));
-		DrawKey(5, keySetX + 6*keyBoxJump, keySetY, Glyph.K, Controller.CurrentKeymap.HasFlag(KeymapUtil.Keymap.Down));
-		DrawKey(6, keySetX + 7*keyBoxJump, keySetY, Glyph.L, Controller.CurrentKeymap.HasFlag(KeymapUtil.Keymap.Sharp));
-		DrawKey(7, keySetX + 8*keyBoxJump, keySetY, Glyph.Semicolon, Controller.CurrentKeymap.HasFlag(KeymapUtil.Keymap.Flat));
+		DrawKeys();
 
-		DrawSpace(spacebarX, spacebarY, Controller.CurrentKeymap.HasFlag(KeymapUtil.Keymap.ApplyOctave));
+		DrawSpace(spacebarX, spacebarY, Controller.CurrentKeymap.HasFlag(Keymap.ApplyOctave));
 	}
 
-	void DrawKey(int index, int x, int y, Glyph glyph, bool pressed)
+	void DrawKeys()
 	{
-		// todo: use index to do everything in here without requiring any other parameters
-		int yOffset = pressed? keyPressedSink : 0;
+		for (int i = 0; i < 8; i++)
+		{
+			bool pressed = Controller.CurrentKeymap.HasFlag(keymapNoteModiferKeys[i]);
+			int slot = i >= 4 ? i + 1 : i; // skip the 5th slot to split ASDF from JKL;
+			int x = keySetX + slot * keyBoxJump;
 
-		// todo: draw all boxes first to allow for proper batching
-		DrawRoundedRectangle(new(x, y + yOffset, keyBoxWidth, keyBoxHeight), pressed? keyPressedColors[index] : keyColor, roundedBoxRadius);
+			int yOffset = pressed? keyPressedSink : 0;
 
-		DrawGlyph(x, y + yOffset, glyph, backgroundColor);
+			// todo: draw all boxes first to allow for proper batching
+			DrawRoundedRectangle(new(x, keySetY + yOffset, keyBoxWidth, keyBoxHeight), pressed? keyPressedColors[i] : keyColor, roundedBoxRadius);
+
+			DrawGlyph(x, keySetY + yOffset, (Glyph)i, backgroundColor);
+		}
 	}
 
 	// todo: use a buffered system to reduce draw calls

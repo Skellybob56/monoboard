@@ -39,4 +39,5 @@ static class KeymapUtil
 	}
 
 	public static readonly ImmutableArray<Keymap> keymapNoteKeys = [Keymap.A, Keymap.S, Keymap.D, Keymap.F];
+	public static readonly ImmutableArray<Keymap> keymapNoteModiferKeys = [Keymap.A, Keymap.S, Keymap.D, Keymap.F, Keymap.Up, Keymap.Down, Keymap.Sharp, Keymap.Flat];
 }
